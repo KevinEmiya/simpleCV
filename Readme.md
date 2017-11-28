@@ -9,7 +9,7 @@ The codes in this repo are developed and tested on _Ubuntu 16.04_
 ### Usage
 
 **1. Building OpenCV from source code**:  
-Use the automatic building script (in tools/build_cv)  
+Use the automatic building script (in [tools/build_cv](https://github.com/KevinEmiya/simpleCV/blob/master/tools/build_cv))  
 The script will generate the dev-env as follows:
  * The source code of opencv and opencv_contrib will be downloaded/updated in _opencv_git_ folder
  * The nesessary codes for building will be copied into the _sdk_ folder. The building works will be executed in this folder without making any change to the original source repos.
