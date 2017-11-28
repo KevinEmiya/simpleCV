@@ -1,0 +1,133 @@
+#!/bin/bash
+
+ROOT_DIR=$(pwd)/..
+GIT_DIR=${ROOT_DIR}/opencv_git
+SDK_DIR=${ROOT_DIR}/sdk
+BUILD_DIR=${SDK_DIR}/opencv
+VERSION=3.3.1
+#HTTP_PROXY_PROP=127.0.0.1:8123
+
+ensure_dirs() {
+	local targets=$@
+	for target in ${targets[@]}; do
+		echo -n "checking ${target}..."
+		if [[ ! -d ${target} ]]; then
+			mkdir -p ${target}
+		fi
+		echo "OK!"
+	done
+}
+
+update_opencv_src() {
+	echo "Updating soruce code..."
+	local src_dirs=(${GIT_DIR} ${SDK_DIR})
+	ensure_dirs ${src_dirs[@]}
+	cd ${GIT_DIR}
+	if [[ -d ${GIT_DIR}/opencv/.git ]]; then
+		git pull
+	else
+		git clone https://github.com/opencv/opencv.git
+	fi
+	if [[ -d ${GIT_DIR}/opencv_contrib ]]; then
+		git pull
+	else
+		git clone https://github.com/opencv/opencv_contrib
+	fi
+	cd ${GIT_DIR}/opencv
+	git checkout ${VERSION}
+	cd ${GIT_DIR}/opencv_contrib
+	git checkout ${VERSION}
+}
+
+prepare_src_codes() {
+	echo "Preparing build environment..."
+	if [[ -d ${BUILD_DIR} ]]; then
+		rm -rf ${BUILD_DIR}
+	fi
+	mkdir ${BUILD_DIR}
+	cd ${GIT_DIR}/opencv
+	local src_modules=(3rdparty apps cmake data doc include modules platforms samples)
+	for module in ${src_modules[@]}; do
+		echo "copying opencv/${module}..."
+		cp -Rf ${module} ${BUILD_DIR}/${module}
+	done
+
+	cp -Rf CMakeLists.txt ${BUILD_DIR}
+	cp -Rf LICENSE ${BUILD_DIR}
+
+	if [[ -d ${BUILD_DIR}/contrib ]]; then
+		rm -rf ${BUILD_DIR}/contrib
+	fi
+	mkdir ${BUILD_DIR}/contrib
+	cd ${GIT_DIR}/opencv_contrib
+	local contrib_modules=(doc modules samples)
+	for module in ${contrib_modules[@]}; do
+		echo "copying opencv_contrib/${module}..."
+		cp -Rf ${module} ${BUILD_DIR}/contrib/${module}/
+	done
+}
+
+install_dependencies() {
+	echo "Installing dependencies..."
+	if [[ -n ${HTTP_PROXY_PROP} ]]; then
+		export http_proxy=http://${HTTP_PROXY_PROP}
+		export https_proxy=https://${HTTP_PROXY_PROP}
+	fi
+
+	sudo apt install -y libjpeg8-dev libjasper-dev libpng12-dev &&
+		sudo apt install -y libtiff5-dev &&
+		sudo apt install -y libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev &&
+		sudo apt install -y libxine2-dev libv4l-dev &&
+		sudo apt install -y libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev &&
+		sudo apt install -y qt5-default libgtk2.0-dev libtbb-dev &&
+		sudo apt install -y libatlas-base-dev &&
+		sudo apt install -y libfaac-dev libmp3lame-dev libtheora-dev &&
+		sudo apt install -y libvorbis-dev libxvidcore-dev &&
+		sudo apt install -y libopencore-amrnb-dev libopencore-amrwb-dev &&
+		sudo apt install -y x264 v4l-utils &&
+		sudo apt install -y python-dev python-pip python3-dev python3-pip
+
+	if [[ -n ${HTTP_PROXY_PROP} ]]; then
+		sudo -H pip2 --proxy ${HTTP_PROXY_PROP} install -U pip numpy &&
+			sudo -H pip3 --proxy ${HTTP_PROXY_PROP} install -U pip numpy
+	else
+		sudo -H pip2 install -U pip numpy &&
+			sudo -H pip3 install -U pip numpy
+	fi
+}
+
+exec_cmake() {
+	"Executing cmake..."
+	cd ${BUILD_DIR}
+	if [[ -d build ]]; then
+		if [[ $1 -eq "--clean" ]]; then
+			rm -rf build/
+		fi
+  else
+		mkdir build
+	fi
+	cd build
+	cmake -D CMAKE_BUILD_TYPE=RELEASE \
+		-D CMAKE_INSTALL_PREFIX=${SDK_DIR}/opencv_release \
+		-D INSTALL_C_EXAMPLES=ON \
+		-D INSTALL_PYTHON_EXAMPLES=ON \
+		-D WITH_TDD=ON \
+		-D WITH_V4L=ON \
+		-D WITH_QT=ON \
+		-D WITH_OPENGL=ON \
+		-D OPENCV_EXTRA_MODULES_PATH=${BUILD_DIR}/contrib/modules \
+		-D BUILD_EXAMPLES=ON ..
+}
+
+exec_make() {
+	"Making..."
+	cd ${BUILD_DIR}/build
+	local core_cnt=$(nproc)
+	make -j${core_cnt} && make install
+}
+
+update_opencv_src &&
+	install_dependencies &&
+	prepare_src_codes &&
+	exec_cmake &&
+	exec_make
