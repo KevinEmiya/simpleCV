@@ -4,8 +4,9 @@ ROOT_DIR=$(pwd)/..
 GIT_DIR=${ROOT_DIR}/opencv_git
 SDK_DIR=${ROOT_DIR}/sdk
 BUILD_DIR=${SDK_DIR}/opencv
+RELEASE_DIR=${SDK_DIR}/opencv_release
 VERSION=3.3.1
-#HTTP_PROXY_PROP=127.0.0.1:8123
+#HTTP_PROXY_PROP=172.17.99.187:8123
 
 ensure_dirs() {
 	local targets=$@
@@ -97,18 +98,18 @@ install_dependencies() {
 }
 
 exec_cmake() {
-	"Executing cmake..."
+	echo "Executing cmake..."
 	cd ${BUILD_DIR}
 	if [[ -d build ]]; then
 		if [[ $1 -eq "--clean" ]]; then
 			rm -rf build/
 		fi
-  else
+	else
 		mkdir build
 	fi
 	cd build
 	cmake -D CMAKE_BUILD_TYPE=RELEASE \
-		-D CMAKE_INSTALL_PREFIX=${SDK_DIR}/opencv_release \
+		-D CMAKE_INSTALL_PREFIX=${RELEASE_DIR} \
 		-D INSTALL_C_EXAMPLES=ON \
 		-D INSTALL_PYTHON_EXAMPLES=ON \
 		-D WITH_TDD=ON \
@@ -126,8 +127,21 @@ exec_make() {
 	make -j${core_cnt} && make install
 }
 
+deploy_extra_libs() {
+	#libippicv
+	echo -n "Deploying libippicv..."
+	local lib_ippicv_path=$(find ${BUILD_DIR}/build/3rdparty/ippicv -name "libippicv.a")
+	if [[ -n ${lib_ippicv_path} ]];then
+		cp ${lib_ippicv_path} ${RELEASE_DIR}/lib && echo "OK" || echo "FAILED!"
+	else
+		echo "FAILED！libippicv not found!"
+	fi
+	
+}
+
 update_opencv_src &&
 	install_dependencies &&
 	prepare_src_codes &&
 	exec_cmake &&
-	exec_make
+	exec_make &&
+	deploy_extra_libs

@@ -1,2 +1,9 @@
 opencv_git/
 sdk/
+*.pro.user
+*.qmake.stash
+*.o
+moc_*
+ui_*
+Makefile
+demos/*/build
