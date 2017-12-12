@@ -1,19 +1,12 @@
-﻿#include "MainWin.h"
-#include <QApplication>
+﻿#include <QApplication>
 
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
+#include "gui/CamDlg.h"
 
 int main(int argc, char *argv[])
 {
-//    QApplication a(argc, argv);
-//    MainWin w;
-//    w.show();
+    QApplication a(argc, argv);
+    CamDlg dlg;
+    dlg.show();
 
-//    return a.exec();
-
-    cv::Mat img = cv::imread("/home/kevin_yang/图片/3675083.png");
-    cv::namedWindow("test");
-    cv::imshow("test", img);
-    cv::waitKey();
+    return a.exec();
 }

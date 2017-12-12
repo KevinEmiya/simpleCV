@@ -11,15 +11,31 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = TestEnv
 TEMPLATE = app
 
-OPENCV_SDK_DIR = /home/kevin_yang/git/simpleCV/sdk/opencv_release
-PKG_CONFIG_PATH = $$OPENCV_SDK_DIR/lib/pkgconfig/
 CONFIG  += link_pkgconfig
 PKGCONFIG += opencv
 LIBS += -L$$OPENCV_SDK_DIR/lib/
 
 SOURCES += main.cpp\
-        MainWin.cpp
+    driver/QCvCamView.cpp \
+    gui/CamDlg.cpp
 
-HEADERS  += MainWin.h
+HEADERS  += \
+    driver/QCvCamView.h \
+    gui/CamDlg.h
 
-FORMS    += MainWin.ui
+FORMS    += \
+    gui/CamDlg.ui
+
+CONFIG(debug, debug|release) {
+    DESTDIR = build/debug
+    OBJECTS_DIR = build/debug/.obj
+    MOC_DIR = build/debug/.moc
+    RCC_DIR = build/debug/.rcc
+    UI_DIR = build/debug/.ui
+} else {
+    DESTDIR = build/release
+    OBJECTS_DIR = build/release/.obj
+    MOC_DIR = build/release/.moc
+    RCC_DIR = build/release/.rcc
+    UI_DIR = build/release/.ui
+}
