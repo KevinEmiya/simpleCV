@@ -5,36 +5,38 @@
 既然都已经必须从源码编译了，不妨添加一些基础安装包里没有包含的高级模块，打造一个功能更为全面的SDK。
 
 ## 编写构建脚本
-在从源码构建一套工具时，因为系统环境差异等各方面的因素，往往会出现一些预料之外的情况导致构建失败，很少能一次就构建成功的情况，因此我个人习惯编写简单的构建脚本来进行构建，减少构建失败时重复敲打命令的工作。
+在从源码构建一套工具时，因为系统环境差异等各方面的因素，往往会出现一些预料之外的情况导致构建失败，很少能一次就构建成功。因此，我个人习惯编写简单的脚本进行构建，以减少构建失败时重复敲打命令的工作。
 
 首先规划一下构建环境的目录结构：  
->simpleCV  
->   |  
->   +-->tools:工具文件夹  
->   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
->   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-->build_cv：构建脚本  
->   |    
->   +-->opencv_git：官方代码库文件夹  
->   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
->   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-->opencv：官方opencv基础库源码  
->   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
->   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-->opencv_contrib：官方contrib源码  
->   |  
->   +-->sdk  
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-->opencv：构建目录，避免污染源码库环境  
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+-->opencv_release：发布目录，也就是最终使用的sdk  
+```
+simpleCV  
+   |  
+   +-->tools:工具文件夹  
+   |   |  
+   |   +-->build_cv：构建脚本  
+   |    
+   +-->opencv_git：官方代码库文件夹  
+   |   |  
+   |   +-->opencv：官方opencv基础库源码  
+   |   |  
+   |   +-->opencv_contrib：官方contrib源码  
+   |  
+   +-->sdk  
+       |  
+       +-->opencv：构建目录，避免污染源码库环境  
+       |  
+       +-->opencv_release：发布目录，也就是最终使用的sdk  
+```
 
 然后大致划分一下构建的步骤：  
 1. 从官方的git repo里拉取最新的源码
 2. 安装依赖
 3. 准备构建环境
 4. 执行cmake和make进行构建
-5. 部署其他库文件
+5. 部署额外的库文件
 
 接下来开始编写脚本。先编写一个基本的脚本框架：
-```bash
+``` bash
 #!/bin/bash
 # 全局变量
 ROOT_DIR=$(pwd)/..
@@ -55,13 +57,13 @@ HTTP_PROXY_PROP=127.0.0.1:8123
 ```
 其中：
 * 全局变量：定义了前面规划的目录结构、准备编译的opencv版本和代理设置
-* 执行入口部分：按照上面划分的步骤，把每一步都包成一个函数，编译的时候如果出错了，可以把前面已经成功的步骤注释掉，只调试出问题的步骤。（现在因为函数都还没有编写，所以暂时先注释起来。）
+* 执行入口部分：按照上面划分的步骤，把每一步都包成一个函数，构建的时候如果出错了，可以把前面已经成功的步骤注释掉，只调试出问题的步骤。（现在因为函数都还没有编写，所以暂时先注释起来。）
 
 下面就来编写各个步骤的函数：
 ### 1. 拉取最新源码
-目前官方的最新代码分为基础包和contrib包，其中contrib包囊括了一些技术较新，但是因为各种原因还没有集成在默认OpenCV中的功能。[[1](#ref1)]
+目前官方的最新代码分为基础包和contrib包，其中contrib包囊括了一些技术较新，但是因为各种原因还没有集成在默认OpenCV中的功能。
 
-这两个包分别对应官方github的opencv和opencv_contrib这两个repo，且这两个repo的版本号是基本一致的。例如本系列使用的3.3。1版本opencv，只需要将两个库均切换到3.3.1标签即可。
+这两个包分别对应官方github的opencv和opencv_contrib这两个repo，且这两个repo的版本号是基本一致的。例如本系列使用的3.3.1版本opencv，只需要将两个库均切换到3.3.1标签即可。
 
 下面是拉取最新源码的脚本：
 ```bash
@@ -211,7 +213,7 @@ exec_make() {
 }
 ```
 
-### 6. 部署其他库文件
+### 6. 部署额外的库文件
 在使用编译好的sdk时，根据cmake设置的不同，可能会有一些动态库需要额外部署到sdk中以方便链接时使用。下面是部署libippicv到sdk路径下的脚本：
 ```bash
 deploy_extra_libs() {
