@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = TestEnv
+TARGET = CameraViewer
 TEMPLATE = app
 
 CONFIG  += link_pkgconfig
@@ -16,11 +16,11 @@ PKGCONFIG += opencv
 LIBS += -L$$OPENCV_SDK_DIR/lib/
 
 SOURCES += main.cpp\
-    driver/QCvCamView.cpp \
+    widget/QCvCamView.cpp \
     gui/CamDlg.cpp
 
 HEADERS  += \
-    driver/QCvCamView.h \
+    widget/QCvCamView.h \
     gui/CamDlg.h
 
 FORMS    += \

@@ -1,7 +1,7 @@
 #include "CamDlg.h"
 #include "ui_CamDlg.h"
 
-#include "driver/QCvCamView.h"
+#include "widget/QCvCamView.h"
 
 #include <QStackedLayout>
 
