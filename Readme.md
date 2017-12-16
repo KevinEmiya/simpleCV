@@ -1,10 +1,16 @@
 # SimpleCV
 
-Some simple tools/libraries/demos for OpenCV3, integrated with Qt and OpenNI
+Some simple tools/libraries/demos for OpenCV3, integrated with Qt and other useful librarys.
 
 ### Dev-Env
 
-The codes in this repo are developed and tested on _Ubuntu 16.04_
+**OS**: Ubuntu 16.04
+
+**IDE**: Qt Creator 4.5.0
+
+**Libraries**:
+* **Qt**: v5.10.0
+* **OpenCv**: v3.1.1
 
 ### Usage
 
@@ -16,6 +22,10 @@ The script will generate the dev-env as follows:
  * The binary distribution of the building works will be installed in _sdk/opencv_release_ folder.
 
 When installing dependencies and python packages, an http proxy could be set at the beginning of the script (as a variable named _HTTP_PROXY_PROP_)
+
+**2. Demos**
+
+Please follow the instructions of test demos in docs folder.
 
 _TBC..._
 
