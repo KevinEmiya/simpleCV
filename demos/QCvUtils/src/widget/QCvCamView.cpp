@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QDebug>
 
+#include "util/QCvDataUtils.h"
+
 QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
 {
     m_cap = new cv::VideoCapture();
@@ -67,11 +69,8 @@ void QCvCamView::paintEvent(QPaintEvent *event)
         if(!m_frame.empty())
         {
             painter.setRenderHints(QPainter::Antialiasing, true);//抗锯齿
-            QImage qImage = QImage((const unsigned char*)(m_frame.data),
-                                   m_frame.cols, m_frame.rows,
-                                   QImage::Format_RGB888).rgbSwapped();
             painter.scale(rect().width() * 1.0 / m_frame.cols, rect().height() * 1.0 / m_frame.rows);
-            painter.drawImage(0, 0, qImage);
+            painter.drawImage(0, 0, QCvDataUtils::cvMatToQImage(m_frame));
         }
         else
         {
