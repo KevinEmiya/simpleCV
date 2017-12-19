@@ -1,9 +1,13 @@
-#ifndef IMAGEDLG_H
+﻿#ifndef IMAGEDLG_H
 #define IMAGEDLG_H
 
 #include <QDialog>
 
 class QString;
+class QCvMatFilterChain;
+class QFileDialog;
+
+#include "opencv2/opencv.hpp"
 
 namespace Ui
 {
@@ -18,11 +22,19 @@ class ImageDlg : public QDialog
     explicit ImageDlg(QWidget* parent = 0);
     ~ImageDlg();
 
-private:
-    void showImage(QString imgPath);
+  private:
+    void showImage(const cv::Mat& mat);
+
+  private slots:
+    void onReadImage();
+    void onExtractEdge();
 
   private:
     Ui::ImageDlg* ui;
+    QCvMatFilterChain* m_filters;
+    cv::Mat m_imgMat;
+
+    QFileDialog* m_imgSelectDlg;
 };
 
 #endif // IMAGEDLG_H

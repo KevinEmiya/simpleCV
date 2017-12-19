@@ -1,4 +1,4 @@
-#ifndef CAMDLG_H
+﻿#ifndef CAMDLG_H
 #define CAMDLG_H
 
 #include <QDialog>
@@ -24,11 +24,14 @@ private slots:
     void onEmptyFrameError();
     void onStatusTimer();
     void onFpsChanged(QString fpsStr);
+    void onExtractEdge();
 
 private:
     Ui::CamDlg *ui;
     QCvCamView* m_camView;
     QTimer* m_statusTimer;
+
+    bool m_useFilter;
 };
 
 #endif // CAMDLG_H

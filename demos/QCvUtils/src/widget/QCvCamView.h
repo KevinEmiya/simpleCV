@@ -1,9 +1,12 @@
-#ifndef QCVCAMVIEW_H
+﻿#ifndef QCVCAMVIEW_H
 #define QCVCAMVIEW_H
 
 #include <QWidget>
 #include <opencv2/opencv.hpp>
 #include <QTimer>
+
+class QCvMatFilterChain;
+class QCvMatFilter;
 
 class QCvCamView : public QWidget
 {
@@ -11,6 +14,10 @@ class QCvCamView : public QWidget
 public:
     explicit QCvCamView(QWidget *parent = 0);
     virtual ~QCvCamView();
+
+public:
+    void appendFilter(QCvMatFilter* filter);
+    void setFilterEnabled(QString name, bool enabled);
 
 signals:
     void camOpenError();
@@ -27,6 +34,7 @@ protected:
 private:
     bool m_streamOpen;
     cv::VideoCapture* m_cap;
+    QCvMatFilterChain* m_filterChain;
     cv::Mat m_frame;
     int m_fps;
     QTimer* m_updateTimer;

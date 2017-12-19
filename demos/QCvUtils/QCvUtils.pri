@@ -8,8 +8,13 @@ PKGCONFIG += opencv
 
 SOURCES += \
     $$PWD/src/widget/QCvCamView.cpp \
-    $$PWD/src/util/QCvDataUtils.cpp
+    $$PWD/src/util/QCvDataUtils.cpp \
+    $$PWD/src/filter/QCvMatFilterChain.cpp \
+    $$PWD/src/filter/QCvEdgeDetectFilter.cpp
 
 HEADERS  += \
     $$PWD/src/widget/QCvCamView.h \
-    $$PWD/src/util/QCvDataUtils.h
+    $$PWD/src/util/QCvDataUtils.h \
+    $$PWD/src/filter/QCvMatFilter.h \
+    $$PWD/src/filter/QCvMatFilterChain.h \
+    $$PWD/src/filter/QCvEdgeDetectFilter.h

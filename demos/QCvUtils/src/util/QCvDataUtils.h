@@ -1,4 +1,4 @@
-#ifndef QCVDATAUTILS_H
+﻿#ifndef QCVDATAUTILS_H
 #define QCVDATAUTILS_H
 
 class QImage;

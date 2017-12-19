@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>327</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,6 +55,13 @@
        </property>
        <property name="checkable">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnEdge">
+       <property name="text">
+        <string>Edge Video</string>
        </property>
       </widget>
      </item>
@@ -108,6 +115,9 @@
     </widget>
    </item>
   </layout>
+  <zorder>frame</zorder>
+  <zorder>statusLabel</zorder>
+  <zorder>btnEdge</zorder>
  </widget>
  <resources/>
  <connections/>

@@ -1,10 +1,11 @@
-#include "QCvCamView.h"
+﻿#include "QCvCamView.h"
 
 #include <QImage>
 #include <QPainter>
 #include <QDebug>
 
 #include "util/QCvDataUtils.h"
+#include "filter/QCvMatFilterChain.h"
 
 QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
 {
@@ -13,6 +14,8 @@ QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
     m_updateTimer = new QTimer(this);
     m_updateTimer->start(1000 / m_fps);
     connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+
+    m_filterChain = new QCvMatFilterChain(this);
 }
 
 QCvCamView::~QCvCamView()
@@ -46,6 +49,16 @@ void QCvCamView::onStreamSwitch(bool open)
     }
 }
 
+void QCvCamView::appendFilter(QCvMatFilter* filter)
+{
+    m_filterChain->append(filter);
+}
+
+void QCvCamView::setFilterEnabled(QString name, bool enabled)
+{
+    m_filterChain->setEnabled(name, enabled);
+}
+
 void QCvCamView::onFpsChanged(int fps)
 {
     if(fps <= 0)
@@ -66,6 +79,7 @@ void QCvCamView::paintEvent(QPaintEvent *event)
     {
         QPainter painter(this);
         m_cap->read(m_frame);
+        m_frame = m_filterChain->execFilter(m_frame);
         if(!m_frame.empty())
         {
             painter.setRenderHints(QPainter::Antialiasing, true);//抗锯齿
