@@ -32,20 +32,20 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
     m_filters->append(cannyFilter);
     connect(ui->btnEdge, &QPushButton::clicked, this, &ImageDlg::onExtractEdge);
 
-    connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter](){
+    connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter]() {
         cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
-        if(m_extractingEdge)
+        if (m_extractingEdge)
         {
-            cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
-            showImage(edgeImg);
+            m_edgeMat = m_filters->execFilter(m_imgMat);
+            showImage(m_edgeMat);
         }
     });
-    connect(ui->highThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter](){
+    connect(ui->highThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter]() {
         cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
-        if(m_extractingEdge)
+        if (m_extractingEdge)
         {
-            cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
-            showImage(edgeImg);
+            m_edgeMat = m_filters->execFilter(m_imgMat);
+            showImage(m_edgeMat);
         }
     });
 }
@@ -63,7 +63,7 @@ void ImageDlg::onReadImage()
         QString path = m_imgSelectDlg->selectedFiles()[0];
         ui->imgLabel->setText("");
         m_imgMat = cv::imread(path.toStdString().c_str());
-        this->showImage(m_imgMat);
+        this->showImage(m_imgMat, true);
     }
     m_imgSelectDlg->hide();
     ui->btnEdge->setEnabled(true);
@@ -71,34 +71,34 @@ void ImageDlg::onReadImage()
 
 void ImageDlg::resizeEvent(QResizeEvent* event)
 {
-   QPixmap pixmap = QPixmap::fromImage(QCvDataUtils::cvMatToQImage(m_imgMat));
-   QSize oldSize = event->oldSize();
-   QSize newSize = event->size();
-   float wRatio = newSize.width() * 1.0 / oldSize.width();
-   float hRatio = newSize.height() * 1.0 / oldSize.height();
-   pixmap = pixmap.scaled(pixmap.width() * wRatio, pixmap.height() * hRatio);
-   ui->imgLabel->setPixmap(pixmap);
-   QDialog::resizeEvent(event);
+    if (ui->imgLabel->pixmap() != NULL)
+    {
+        cv::Mat matCache = m_extractingEdge ? m_edgeMat : m_imgMat;
+        QImage img = QCvDataUtils::cvMatToQImage(matCache);
+        ui->imgLabel->setPixmap(QPixmap::fromImage(img).scaled(ui->imgLabel->width(),
+                                                               ui->imgLabel->height()));
+    }
+    QDialog::resizeEvent(event);
 }
 
 void ImageDlg::onExtractEdge(bool clicked)
 {
     m_extractingEdge = clicked;
-    if(clicked)
+    showImage(clicked ? m_filters->execFilter(m_imgMat) : m_imgMat);
+}
+
+void ImageDlg::showImage(const cv::Mat& mat, bool showOrigSize)
+{
+    QImage img = QCvDataUtils::cvMatToQImage(mat);
+    if (showOrigSize)
     {
-        cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
-        showImage(edgeImg);
+        ui->imgLabel->setPixmap(QPixmap::fromImage(img));
+        resize(width() - ui->imgLabel->width() + img.width(),
+               height() - ui->imgLabel->height() + img.height());
     }
     else
     {
-        showImage(m_imgMat);
+        ui->imgLabel->setPixmap(QPixmap::fromImage(img).scaled(ui->imgLabel->width(),
+                                                               ui->imgLabel->height()));
     }
-}
-
-void ImageDlg::showImage(const cv::Mat& mat)
-{
-    QImage img = QCvDataUtils::cvMatToQImage(mat);
-    ui->imgLabel->setPixmap(QPixmap::fromImage(img));
-    resize(width() - ui->imgLabel->width() + img.width(),
-           height() - ui->imgLabel->height() + img.height());
 }

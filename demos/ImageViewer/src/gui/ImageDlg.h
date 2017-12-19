@@ -27,7 +27,7 @@ class ImageDlg : public QDialog
     void resizeEvent(QResizeEvent* event);
 
   private:
-    void showImage(const cv::Mat& mat);
+    void showImage(const cv::Mat& mat, bool showOrigSize = false);
 
   private slots:
     void onReadImage();
@@ -38,6 +38,7 @@ class ImageDlg : public QDialog
     cv::Mat m_imgMat;
     QFileDialog* m_imgSelectDlg;
 
+    cv::Mat m_edgeMat;
     QCvMatFilterChain* m_filters;
     bool m_extractingEdge;
 };
