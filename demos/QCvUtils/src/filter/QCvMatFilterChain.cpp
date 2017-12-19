@@ -26,7 +26,7 @@ void QCvMatFilterChain::setEnabled(QString filterName, bool enabled)
 }
 
 
-cv::Mat QCvMatFilterChain::execFilter(cv::Mat& mat)
+cv::Mat QCvMatFilterChain::execFilter(const cv::Mat& mat)
 {
     cv::Mat retMat;
     foreach (QCvMatFilter* filter, m_filters)

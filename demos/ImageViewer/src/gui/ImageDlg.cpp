@@ -28,8 +28,26 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
     m_imgSelectDlg->hide();
     connect(ui->btnOpen, &QPushButton::clicked, this, &ImageDlg::onReadImage);
     m_filters = new QCvMatFilterChain(this);
-    m_filters->append(new QCvEdgeDetectFilter());
+    QCvEdgeDetectFilter* cannyFilter = new QCvEdgeDetectFilter("canny");
+    m_filters->append(cannyFilter);
     connect(ui->btnEdge, &QPushButton::clicked, this, &ImageDlg::onExtractEdge);
+
+    connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter](){
+        cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
+        if(m_extractingEdge)
+        {
+            cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
+            showImage(edgeImg);
+        }
+    });
+    connect(ui->highThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter](){
+        cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
+        if(m_extractingEdge)
+        {
+            cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
+            showImage(edgeImg);
+        }
+    });
 }
 
 ImageDlg::~ImageDlg()
@@ -51,10 +69,30 @@ void ImageDlg::onReadImage()
     ui->btnEdge->setEnabled(true);
 }
 
-void ImageDlg::onExtractEdge()
+void ImageDlg::resizeEvent(QResizeEvent* event)
 {
-    cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
-    showImage(edgeImg);
+   QPixmap pixmap = QPixmap::fromImage(QCvDataUtils::cvMatToQImage(m_imgMat));
+   QSize oldSize = event->oldSize();
+   QSize newSize = event->size();
+   float wRatio = newSize.width() * 1.0 / oldSize.width();
+   float hRatio = newSize.height() * 1.0 / oldSize.height();
+   pixmap = pixmap.scaled(pixmap.width() * wRatio, pixmap.height() * hRatio);
+   ui->imgLabel->setPixmap(pixmap);
+   QDialog::resizeEvent(event);
+}
+
+void ImageDlg::onExtractEdge(bool clicked)
+{
+    m_extractingEdge = clicked;
+    if(clicked)
+    {
+        cv::Mat edgeImg = m_filters->execFilter(m_imgMat);
+        showImage(edgeImg);
+    }
+    else
+    {
+        showImage(m_imgMat);
+    }
 }
 
 void ImageDlg::showImage(const cv::Mat& mat)

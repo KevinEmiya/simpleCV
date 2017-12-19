@@ -18,7 +18,7 @@ public:
     void append(QCvMatFilter* filter);
     void setEnabled(QString filterName, bool enabled);
 
-    cv::Mat execFilter(cv::Mat& mat);
+    cv::Mat execFilter(const cv::Mat& mat);
 
 private:
     QList<QCvMatFilter*> m_filters;

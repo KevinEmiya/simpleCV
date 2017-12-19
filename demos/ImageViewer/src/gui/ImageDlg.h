@@ -8,6 +8,7 @@ class QCvMatFilterChain;
 class QFileDialog;
 
 #include "opencv2/opencv.hpp"
+#include <QResizeEvent>
 
 namespace Ui
 {
@@ -22,19 +23,23 @@ class ImageDlg : public QDialog
     explicit ImageDlg(QWidget* parent = 0);
     ~ImageDlg();
 
+  protected:
+    void resizeEvent(QResizeEvent* event);
+
   private:
     void showImage(const cv::Mat& mat);
 
   private slots:
     void onReadImage();
-    void onExtractEdge();
+    void onExtractEdge(bool clicked);
 
   private:
     Ui::ImageDlg* ui;
-    QCvMatFilterChain* m_filters;
     cv::Mat m_imgMat;
-
     QFileDialog* m_imgSelectDlg;
+
+    QCvMatFilterChain* m_filters;
+    bool m_extractingEdge;
 };
 
 #endif // IMAGEDLG_H

@@ -24,7 +24,7 @@ class QCvEdgeDetectFilter : public QCvMatFilter
 
   public:
     void setThresholds(int lower, int higher);
-    cv::Mat execFilter(cv::Mat& mat);
+    cv::Mat execFilter(const cv::Mat& mat);
 
   private:
     OPERATOR_TYPE m_type;

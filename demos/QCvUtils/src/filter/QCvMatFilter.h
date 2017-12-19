@@ -17,14 +17,14 @@ class QCvMatFilter
     QString name() { return m_name; }
     void setEnabled(bool enabled) { m_enabled = enabled; }
 
-    cv::Mat filter(cv::Mat& mat)
+    cv::Mat filter(const cv::Mat& mat)
     {
 
         return m_enabled ? execFilter(mat) : mat;
     }
 
   protected:
-    virtual cv::Mat execFilter(cv::Mat& mat) = 0;
+    virtual cv::Mat execFilter(const cv::Mat& mat) = 0;
 
   protected:
     QString m_name;
