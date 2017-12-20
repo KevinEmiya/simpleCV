@@ -28,10 +28,10 @@ void QCvMatFilterChain::setEnabled(QString filterName, bool enabled)
 
 cv::Mat QCvMatFilterChain::execFilter(const cv::Mat& mat)
 {
-    cv::Mat retMat;
+    cv::Mat retMat = mat;
     foreach (QCvMatFilter* filter, m_filters)
     {
-        retMat = filter->filter(mat);
+        retMat = filter->filter(retMat);
     }
     return retMat;
 }

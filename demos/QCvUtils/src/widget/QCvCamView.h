@@ -2,7 +2,7 @@
 #define QCVCAMVIEW_H
 
 #include <QWidget>
-#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
 #include <QTimer>
 
 class QCvMatFilterChain;

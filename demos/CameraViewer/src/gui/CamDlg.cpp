@@ -3,6 +3,7 @@
 
 #include "widget/QCvCamView.h"
 #include "filter/QCvEdgeDetectFilter.h"
+#include "filter/QCvGaussFilter.h"
 
 #include <QStackedLayout>
 
@@ -21,10 +22,17 @@ CamDlg::CamDlg(QWidget *parent) :
     connect(ui->btnEdge, &QPushButton::clicked, this, &CamDlg::onExtractEdge);
     connect(m_camView, &QCvCamView::camOpenError, this, &CamDlg::onCamOpenError);
     connect(m_camView, &QCvCamView::emptyFrameError, this, &CamDlg::onEmptyFrameError);
+
+    QCvGaussFilter* gaussFilter = new QCvGaussFilter("gauss");
+    gaussFilter->setKernelSize(20);
+    m_camView->appendFilter(gaussFilter);
+    m_camView->setFilterEnabled("gauss", false);
+
     QCvEdgeDetectFilter* edgeFilter = new QCvEdgeDetectFilter("canny");
-    edgeFilter->setThresholds(80, 160);
+    edgeFilter->setThresholds(40, 80);
     m_camView->appendFilter(edgeFilter);
     m_camView->setFilterEnabled("canny", false);
+
     m_useFilter = false;
 
     m_statusTimer = new QTimer(this);
@@ -78,12 +86,14 @@ void CamDlg::onExtractEdge()
     if(m_useFilter)
     {
         ui->btnEdge->setText("Edge Video");
+        m_camView->setFilterEnabled("gauss", false);
         m_camView->setFilterEnabled("canny", false);
         m_useFilter = false;
     }
     else
     {
         ui->btnEdge->setText("Oirg Video");
+        m_camView->setFilterEnabled("gauss", true);
         m_camView->setFilterEnabled("canny", true);
         m_useFilter = true;
     }
