@@ -7,6 +7,7 @@
 #include <QStringList>
 
 #include "filter/QCvEdgeDetectFilter.h"
+#include "filter/QCvHisEqFilter.h"
 #include "filter/QCvMatFilterChain.h"
 #include "util/QCvDataUtils.h"
 
@@ -27,16 +28,24 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
     m_imgSelectDlg->setNameFilters(nameFilters);
     m_imgSelectDlg->hide();
     connect(ui->btnOpen, &QPushButton::clicked, this, &ImageDlg::onReadImage);
-    m_filters = new QCvMatFilterChain(this);
+
+    m_edgeFilter = new QCvMatFilterChain(this);
     QCvEdgeDetectFilter* cannyFilter = new QCvEdgeDetectFilter("canny");
-    m_filters->append(cannyFilter);
+    m_edgeFilter->append(cannyFilter);
     connect(ui->btnEdge, &QPushButton::clicked, this, &ImageDlg::onExtractEdge);
+
+    m_histFilter = new QCvMatFilterChain(this);
+    m_histFilter->append(new QCvHisEqFilter("histeq"));
+    connect(ui->btnAdjust, &QPushButton::clicked, this, [this]() {
+        m_imgMat = m_histFilter->execFilter(m_imgMat);
+        showImage(m_imgMat);
+    });
 
     connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter]() {
         cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
         if (m_extractingEdge)
         {
-            m_edgeMat = m_filters->execFilter(m_imgMat);
+            m_edgeMat = m_edgeFilter->execFilter(m_imgMat);
             showImage(m_edgeMat);
         }
     });
@@ -44,7 +53,7 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
         cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
         if (m_extractingEdge)
         {
-            m_edgeMat = m_filters->execFilter(m_imgMat);
+            m_edgeMat = m_edgeFilter->execFilter(m_imgMat);
             showImage(m_edgeMat);
         }
     });
@@ -67,6 +76,7 @@ void ImageDlg::onReadImage()
     }
     m_imgSelectDlg->hide();
     ui->btnEdge->setEnabled(true);
+    ui->btnAdjust->setEnabled(true);
 }
 
 void ImageDlg::resizeEvent(QResizeEvent* event)
@@ -84,7 +94,7 @@ void ImageDlg::resizeEvent(QResizeEvent* event)
 void ImageDlg::onExtractEdge(bool clicked)
 {
     m_extractingEdge = clicked;
-    showImage(clicked ? m_filters->execFilter(m_imgMat) : m_imgMat);
+    showImage(clicked ? m_edgeFilter->execFilter(m_imgMat) : m_imgMat);
 }
 
 void ImageDlg::showImage(const cv::Mat& mat, bool showOrigSize)

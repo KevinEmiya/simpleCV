@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>373</width>
-    <height>345</height>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,6 +67,16 @@ color: rgba(176, 176, 176, 128);</string>
       <widget class="QPushButton" name="btnOpen">
        <property name="text">
         <string>Open Image...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdjust">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Adjust Image</string>
        </property>
       </widget>
      </item>

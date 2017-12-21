@@ -4,6 +4,7 @@
 #include "widget/QCvCamView.h"
 #include "filter/QCvEdgeDetectFilter.h"
 #include "filter/QCvGaussFilter.h"
+#include "filter/QCvHisEqFilter.h"
 
 #include <QStackedLayout>
 
@@ -22,9 +23,14 @@ CamDlg::CamDlg(QWidget *parent) :
     connect(ui->btnEdge, &QPushButton::clicked, this, &CamDlg::onExtractEdge);
     connect(m_camView, &QCvCamView::camOpenError, this, &CamDlg::onCamOpenError);
     connect(m_camView, &QCvCamView::emptyFrameError, this, &CamDlg::onEmptyFrameError);
+    connect(ui->btnHiseq, &QPushButton::clicked, this, &CamDlg::onHisteq);
+
+    QCvHisEqFilter* histFilter = new QCvHisEqFilter("histeq");
+    m_camView->appendFilter(histFilter);
+    m_camView->setFilterEnabled("histeq", false);
 
     QCvGaussFilter* gaussFilter = new QCvGaussFilter("gauss");
-    gaussFilter->setKernelSize(20);
+    gaussFilter->setKernelSize(7);
     m_camView->appendFilter(gaussFilter);
     m_camView->setFilterEnabled("gauss", false);
 
@@ -32,8 +38,6 @@ CamDlg::CamDlg(QWidget *parent) :
     edgeFilter->setThresholds(40, 80);
     m_camView->appendFilter(edgeFilter);
     m_camView->setFilterEnabled("canny", false);
-
-    m_useFilter = false;
 
     m_statusTimer = new QTimer(this);
     connect(m_statusTimer, SIGNAL(timeout()), this, SLOT(onStatusTimer()));
@@ -59,6 +63,8 @@ void CamDlg::onBtnOpenClicked(bool clicked)
     {
         ui->btnOpenCam->setText("Open Camera");
     }
+    ui->btnEdge->setEnabled(clicked);
+    ui->btnHiseq->setEnabled(clicked);
 }
 
 void CamDlg::onCamOpenError()
@@ -81,22 +87,23 @@ void CamDlg::onStatusTimer()
     ui->statusLabel->clear();
 }
 
-void CamDlg::onExtractEdge()
+void CamDlg::onExtractEdge(bool clicked)
 {
-    if(m_useFilter)
+    if(clicked)
     {
         ui->btnEdge->setText("Edge Video");
-        m_camView->setFilterEnabled("gauss", false);
-        m_camView->setFilterEnabled("canny", false);
-        m_useFilter = false;
     }
     else
     {
         ui->btnEdge->setText("Oirg Video");
-        m_camView->setFilterEnabled("gauss", true);
-        m_camView->setFilterEnabled("canny", true);
-        m_useFilter = true;
     }
+    m_camView->setFilterEnabled("gauss", clicked);
+    m_camView->setFilterEnabled("canny", clicked);
+}
+
+void CamDlg::onHisteq(bool clicked)
+{
+    m_camView->setFilterEnabled("histeq", clicked);
 }
 
 

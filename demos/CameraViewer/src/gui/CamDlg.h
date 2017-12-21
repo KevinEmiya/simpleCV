@@ -24,14 +24,13 @@ private slots:
     void onEmptyFrameError();
     void onStatusTimer();
     void onFpsChanged(QString fpsStr);
-    void onExtractEdge();
+    void onExtractEdge(bool clicked);
+    void onHisteq(bool clicked);
 
 private:
     Ui::CamDlg *ui;
     QCvCamView* m_camView;
     QTimer* m_statusTimer;
-
-    bool m_useFilter;
 };
 
 #endif // CAMDLG_H

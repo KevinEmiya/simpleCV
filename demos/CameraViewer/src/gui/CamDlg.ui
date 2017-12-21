@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
+    <width>418</width>
     <height>324</height>
    </rect>
   </property>
@@ -59,9 +59,28 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnHiseq">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Adjust Intensity</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnEdge">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Edge Video</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -115,9 +134,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>frame</zorder>
-  <zorder>statusLabel</zorder>
-  <zorder>btnEdge</zorder>
  </widget>
  <resources/>
  <connections/>
