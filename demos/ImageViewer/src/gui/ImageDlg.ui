@@ -71,16 +71,6 @@ color: rgba(176, 176, 176, 128);</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnAdjust">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Adjust Image</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

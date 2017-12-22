@@ -25,7 +25,6 @@ private slots:
     void onStatusTimer();
     void onFpsChanged(QString fpsStr);
     void onExtractEdge(bool clicked);
-    void onHisteq(bool clicked);
 
 private:
     Ui::CamDlg *ui;

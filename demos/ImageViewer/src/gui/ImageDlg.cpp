@@ -34,13 +34,6 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
     m_edgeFilter->append(cannyFilter);
     connect(ui->btnEdge, &QPushButton::clicked, this, &ImageDlg::onExtractEdge);
 
-    m_histFilter = new QCvMatFilterChain(this);
-    m_histFilter->append(new QCvHisEqFilter("histeq"));
-    connect(ui->btnAdjust, &QPushButton::clicked, this, [this]() {
-        m_imgMat = m_histFilter->execFilter(m_imgMat);
-        showImage(m_imgMat);
-    });
-
     connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter]() {
         cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
         if (m_extractingEdge)
@@ -76,7 +69,6 @@ void ImageDlg::onReadImage()
     }
     m_imgSelectDlg->hide();
     ui->btnEdge->setEnabled(true);
-    ui->btnAdjust->setEnabled(true);
 }
 
 void ImageDlg::resizeEvent(QResizeEvent* event)
