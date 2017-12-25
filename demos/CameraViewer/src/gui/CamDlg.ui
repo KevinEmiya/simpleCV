@@ -6,8 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
+<<<<<<< HEAD
     <width>391</width>
     <height>323</height>
+=======
+    <width>418</width>
+    <height>324</height>
+>>>>>>> cf0df610b04d50d0fc8f113eb363b207fad1dbe6
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,12 +64,19 @@
       </widget>
      </item>
      <item>
+<<<<<<< HEAD
       <widget class="QPushButton" name="btnCap">
+=======
+      <widget class="QPushButton" name="btnEdge">
+>>>>>>> cf0df610b04d50d0fc8f113eb363b207fad1dbe6
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
         <string>Capture Frame</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
