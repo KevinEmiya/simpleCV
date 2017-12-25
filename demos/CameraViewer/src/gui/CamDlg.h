@@ -5,6 +5,7 @@
 #include <QTimer>
 
 class QCvCamView;
+class CapDlg;
 
 namespace Ui {
 class CamDlg;
@@ -18,23 +19,20 @@ public:
     explicit CamDlg(QWidget *parent = 0);
     ~CamDlg();
 
-private:
-    void initFilters();
-
 private slots:
     void onBtnOpenClicked(bool clicked);
     void onCamOpenError();
     void onEmptyFrameError();
     void onStatusTimer();
     void onFpsChanged(QString fpsStr);
-    void onExtractEdge();
+    void onCapFrame();
+    void onCapDlgClosed();
 
 private:
     Ui::CamDlg *ui;
     QCvCamView* m_camView;
     QTimer* m_statusTimer;
-
-    bool m_useFilter;
+    CapDlg* m_capDlg;
 };
 
 #endif // CAMDLG_H

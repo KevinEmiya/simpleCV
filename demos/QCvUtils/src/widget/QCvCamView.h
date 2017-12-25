@@ -18,6 +18,7 @@ public:
 public:
     void appendFilter(QCvMatFilter* filter);
     void setFilterEnabled(QString name, bool enabled);
+    cv::Mat currentFrame();
 
 signals:
     void camOpenError();

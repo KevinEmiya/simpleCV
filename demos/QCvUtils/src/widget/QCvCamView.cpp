@@ -34,10 +34,11 @@ void QCvCamView::onStreamSwitch(bool open)
         m_streamOpen = true;
         if(!m_cap->isOpened())
         {
-            m_cap->open(0);
-            if(!m_cap->isOpened())
+            bool ret = m_cap->open(0);
+            if(!ret || !m_cap->isOpened())
             {
                 emit camOpenError();
+                return;
             }
         }
         update();
@@ -57,6 +58,11 @@ void QCvCamView::appendFilter(QCvMatFilter* filter)
 void QCvCamView::setFilterEnabled(QString name, bool enabled)
 {
     m_filterChain->setEnabled(name, enabled);
+}
+
+cv::Mat QCvCamView::currentFrame()
+{
+    return m_frame;
 }
 
 void QCvCamView::onFpsChanged(int fps)

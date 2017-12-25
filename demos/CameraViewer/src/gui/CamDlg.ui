@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>324</height>
+    <width>391</width>
+    <height>323</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,9 +59,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnEdge">
+      <widget class="QPushButton" name="btnCap">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Edge Video</string>
+        <string>Capture Frame</string>
        </property>
       </widget>
      </item>
@@ -115,9 +118,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>frame</zorder>
-  <zorder>statusLabel</zorder>
-  <zorder>btnEdge</zorder>
  </widget>
  <resources/>
  <connections/>

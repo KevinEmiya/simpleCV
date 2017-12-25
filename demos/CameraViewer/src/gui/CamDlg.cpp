@@ -3,8 +3,13 @@
 
 #include "widget/QCvCamView.h"
 #include "filter/QCvEdgeDetectFilter.h"
+#include "util/QCvDataUtils.h"
+#include "CapDlg.h"
 
 #include <QStackedLayout>
+#include <QFileDialog>
+#include <QDateTime>
+#include <QDebug>
 
 CamDlg::CamDlg(QWidget *parent) :
     QDialog(parent),
@@ -18,7 +23,7 @@ CamDlg::CamDlg(QWidget *parent) :
     layout->addWidget(m_camView);
     connect(ui->btnOpenCam, &QPushButton::clicked, m_camView, &QCvCamView::onStreamSwitch);
     connect(ui->btnOpenCam, &QPushButton::clicked, this, &CamDlg::onBtnOpenClicked);
-    connect(ui->btnEdge, &QPushButton::clicked, this, &CamDlg::onExtractEdge);
+    connect(ui->btnCap, &QPushButton::clicked, this, &CamDlg::onCapFrame);
     connect(m_camView, &QCvCamView::camOpenError, this, &CamDlg::onCamOpenError);
     connect(m_camView, &QCvCamView::emptyFrameError, this, &CamDlg::onEmptyFrameError);
 
@@ -29,21 +34,16 @@ CamDlg::CamDlg(QWidget *parent) :
     ui->fpsEdit->setValidator(new QRegExpValidator(fpsReg, this));
     connect(ui->fpsEdit, SIGNAL(textChanged(QString)), this, SLOT(onFpsChanged(QString)));
 
-    initFilters();
+    m_capDlg = new CapDlg(this);
+    m_capDlg->setModal(true);
+    m_capDlg->setWindowFlags(m_capDlg->windowFlags()|Qt::FramelessWindowHint);
+    m_capDlg->hide();
+    connect(m_capDlg, &CapDlg::closed, this, &CamDlg::onCapDlgClosed);
 }
 
 CamDlg::~CamDlg()
 {
     delete ui;
-}
-
-void CamDlg::initFilters()
-{
-    QCvEdgeDetectFilter* edgeFilter = new QCvEdgeDetectFilter("canny");
-    edgeFilter->setThresholds(80, 160);
-    m_camView->appendFilter(edgeFilter);
-    m_camView->setFilterEnabled("canny", false);
-    m_useFilter = false;
 }
 
 void CamDlg::onBtnOpenClicked(bool clicked)
@@ -57,20 +57,23 @@ void CamDlg::onBtnOpenClicked(bool clicked)
     {
         ui->btnOpenCam->setText("Open Camera");
     }
+    ui->btnOpenCam->setChecked(clicked);
+    ui->btnCap->setEnabled(clicked);
 }
 
 void CamDlg::onCamOpenError()
 {
     ui->statusLabel->setText("Open Camera Failed!");
     m_statusTimer->start(5000);
-    ui->btnOpenCam->click();
+    ui->btnOpenCam->setText("Open Camera");
+    ui->btnOpenCam->setChecked(false);
+    ui->btnCap->setEnabled(false);
 }
 
 void CamDlg::onEmptyFrameError()
 {
     ui->statusLabel->setText("Frame Capture Failed!");
     m_statusTimer->start(5000);
-    ui->btnOpenCam->click();
 }
 
 void CamDlg::onStatusTimer()
@@ -79,27 +82,31 @@ void CamDlg::onStatusTimer()
     ui->statusLabel->clear();
 }
 
-void CamDlg::onExtractEdge()
-{
-    if(m_useFilter)
-    {
-        ui->btnEdge->setText("Edge Video");
-        m_camView->setFilterEnabled("canny", false);
-        m_useFilter = false;
-    }
-    else
-    {
-        ui->btnEdge->setText("Oirg Video");
-        m_camView->setFilterEnabled("canny", true);
-        m_useFilter = true;
-    }
-}
-
-
 void CamDlg::onFpsChanged(QString fpsStr)
 {
     if(!fpsStr.isEmpty())
     {
         m_camView->onFpsChanged(fpsStr.toInt());
     }
+}
+
+void CamDlg::onCapFrame()
+{
+    cv::Mat currentFrame = m_camView->currentFrame();
+    if(!currentFrame.empty())
+    {
+        m_camView->onStreamSwitch(false);
+        m_capDlg->show();
+        m_capDlg->setFrame(currentFrame);
+    }
+    else
+    {
+        ui->statusLabel->setText("Current frame is empty! Please try later...");
+        m_statusTimer->start(5000);
+    }
+}
+
+void CamDlg::onCapDlgClosed()
+{
+    m_camView->onStreamSwitch(true);
 }
