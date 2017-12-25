@@ -40,7 +40,7 @@ class ImageDlg : public QDialog
     QFileDialog* m_imgSelectDlg;
 
     cv::Mat m_edgeMat;
-    QCvMatFilterChain* m_edgeFilter;
+    QCvMatFilterChain* m_filters;
     bool m_extractingEdge;
 };
 
