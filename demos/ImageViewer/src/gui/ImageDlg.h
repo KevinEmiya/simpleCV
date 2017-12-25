@@ -27,6 +27,7 @@ class ImageDlg : public QDialog
     void resizeEvent(QResizeEvent* event);
 
   private:
+    void initFilters();
     void showImage(const cv::Mat& mat, bool showOrigSize = false);
 
   private slots:

@@ -18,6 +18,9 @@ public:
     explicit CamDlg(QWidget *parent = 0);
     ~CamDlg();
 
+private:
+    void initFilters();
+
 private slots:
     void onBtnOpenClicked(bool clicked);
     void onCamOpenError();

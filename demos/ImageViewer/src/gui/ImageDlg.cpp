@@ -27,6 +27,17 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
     m_imgSelectDlg->setNameFilters(nameFilters);
     m_imgSelectDlg->hide();
     connect(ui->btnOpen, &QPushButton::clicked, this, &ImageDlg::onReadImage);
+
+    initFilters();
+}
+
+ImageDlg::~ImageDlg()
+{
+    delete ui;
+}
+
+void ImageDlg::initFilters()
+{
     m_filters = new QCvMatFilterChain(this);
     QCvEdgeDetectFilter* cannyFilter = new QCvEdgeDetectFilter("canny");
     m_filters->append(cannyFilter);
@@ -48,11 +59,6 @@ ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
             showImage(m_edgeMat);
         }
     });
-}
-
-ImageDlg::~ImageDlg()
-{
-    delete ui;
 }
 
 void ImageDlg::onReadImage()

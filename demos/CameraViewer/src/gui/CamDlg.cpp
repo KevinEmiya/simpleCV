@@ -21,11 +21,6 @@ CamDlg::CamDlg(QWidget *parent) :
     connect(ui->btnEdge, &QPushButton::clicked, this, &CamDlg::onExtractEdge);
     connect(m_camView, &QCvCamView::camOpenError, this, &CamDlg::onCamOpenError);
     connect(m_camView, &QCvCamView::emptyFrameError, this, &CamDlg::onEmptyFrameError);
-    QCvEdgeDetectFilter* edgeFilter = new QCvEdgeDetectFilter("canny");
-    edgeFilter->setThresholds(80, 160);
-    m_camView->appendFilter(edgeFilter);
-    m_camView->setFilterEnabled("canny", false);
-    m_useFilter = false;
 
     m_statusTimer = new QTimer(this);
     connect(m_statusTimer, SIGNAL(timeout()), this, SLOT(onStatusTimer()));
@@ -33,11 +28,22 @@ CamDlg::CamDlg(QWidget *parent) :
     QRegExp fpsReg("^100|[1-9]{0,1}[0-9]$");
     ui->fpsEdit->setValidator(new QRegExpValidator(fpsReg, this));
     connect(ui->fpsEdit, SIGNAL(textChanged(QString)), this, SLOT(onFpsChanged(QString)));
+
+    initFilters();
 }
 
 CamDlg::~CamDlg()
 {
     delete ui;
+}
+
+void CamDlg::initFilters()
+{
+    QCvEdgeDetectFilter* edgeFilter = new QCvEdgeDetectFilter("canny");
+    edgeFilter->setThresholds(80, 160);
+    m_camView->appendFilter(edgeFilter);
+    m_camView->setFilterEnabled("canny", false);
+    m_useFilter = false;
 }
 
 void CamDlg::onBtnOpenClicked(bool clicked)
