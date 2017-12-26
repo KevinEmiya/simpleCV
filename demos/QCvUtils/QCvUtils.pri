@@ -12,7 +12,8 @@ SOURCES += \
     $$PWD/src/filter/QCvMatFilterChain.cpp \
     $$PWD/src/filter/QCvEdgeDetectFilter.cpp \
     $$PWD/src/filter/QCvGaussFilter.cpp \
-    $$PWD/src/filter/QCvHisEqFilter.cpp
+    $$PWD/src/filter/QCvHisEqFilter.cpp \
+    $$PWD/src/filter/QCvFaceDetectFilter.cpp
 
 HEADERS  += \
     $$PWD/src/widget/QCvCamView.h \
@@ -21,4 +22,5 @@ HEADERS  += \
     $$PWD/src/filter/QCvMatFilterChain.h \
     $$PWD/src/filter/QCvEdgeDetectFilter.h \
     $$PWD/src/filter/QCvGaussFilter.h \
-    $$PWD/src/filter/QCvHisEqFilter.h
+    $$PWD/src/filter/QCvHisEqFilter.h \
+    $$PWD/src/filter/QCvFaceDetectFilter.h
