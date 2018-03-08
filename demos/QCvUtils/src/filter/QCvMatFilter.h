@@ -3,14 +3,17 @@
 
 #include <opencv2/core.hpp>
 
+#include <QObject>
 #include <QString>
 
-class QCvMatFilter
+class QCvMatFilter : public QObject
 {
+    Q_OBJECT
   public:
-    QCvMatFilter(QString name) : m_name(name)
+    QCvMatFilter(QString name, QObject* parent = nullptr) : QObject(parent)
     {
         m_enabled = true;
+        m_name = name;
     }
 
   public:

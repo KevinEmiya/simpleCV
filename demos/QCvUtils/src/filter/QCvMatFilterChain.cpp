@@ -6,11 +6,12 @@ QCvMatFilterChain::QCvMatFilterChain(QObject* parent) : QObject(parent)
 
 QCvMatFilterChain::~QCvMatFilterChain()
 {
-    qDeleteAll(m_filters);
+    //qDeleteAll(m_filters);
 }
 
 void QCvMatFilterChain::append(QCvMatFilter* filter)
 {
+    filter->setParent(this);
     m_filters.append(filter);
 }
 

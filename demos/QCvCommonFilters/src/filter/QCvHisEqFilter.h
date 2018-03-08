@@ -1,7 +1,7 @@
 ﻿#ifndef QCVHISEQFILTER_H
 #define QCVHISEQFILTER_H
 
-#include "QCvMatFilter.h"
+#include "filter/QCvMatFilter.h"
 
 class QCvHisEqFilter : public QCvMatFilter
 {

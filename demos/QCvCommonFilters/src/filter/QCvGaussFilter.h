@@ -1,7 +1,7 @@
 ﻿#ifndef QCVGAUSSFILTER_H
 #define QCVGAUSSFILTER_H
 
-#include "QCvMatFilter.h"
+#include "filter/QCvMatFilter.h"
 
 class QCvGaussFilter : public QCvMatFilter
 {

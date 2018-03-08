@@ -1,7 +1,7 @@
 ﻿#ifndef QCVEDGEDETECTFILTER_H
 #define QCVEDGEDETECTFILTER_H
 
-#include "QCvMatFilter.h"
+#include "filter/QCvMatFilter.h"
 
 #include <QString>
 
