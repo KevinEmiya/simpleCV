@@ -2,7 +2,6 @@
 #include "ui_CamDlg.h"
 
 #include "widget/QCvCamView.h"
-#include "filter/QCvEdgeDetectFilter.h"
 #include "util/QCvDataUtils.h"
 #include "CapDlg.h"
 

@@ -4,6 +4,7 @@
 class QImage;
 
 #include <opencv2/core.hpp>
+#include <QLabel>
 
 class QCvDataUtils
 {
