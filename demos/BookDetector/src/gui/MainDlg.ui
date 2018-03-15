@@ -6,24 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
+    <width>503</width>
     <height>285</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Book Feature Capturer</string>
+   <string>Book Tracker</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="styleSheet">
-      <string notr="true">font: 75 14pt &quot;Ubuntu Mono&quot;;</string>
-     </property>
-     <property name="text">
-      <string>Muster Model Generator</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -62,6 +52,13 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnLoadCamInt">
+         <property name="text">
+          <string>Load Camera Intrinsic</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnLoad">

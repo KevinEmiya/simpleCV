@@ -10,6 +10,7 @@ class QCvDataUtils
 {
 public:
     static QImage cvMatToQImage(const cv::Mat& mat);
+    static void showCvMat2D(const cv::Mat_<float>& mat);
 };
 
 #endif // QCVDATAUTILS_H

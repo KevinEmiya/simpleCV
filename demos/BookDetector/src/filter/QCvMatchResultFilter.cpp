@@ -1,20 +1,28 @@
 #include "QCvMatchResultFilter.h"
 
-Mat QCvMatchResultFilter::execFilter(const Mat &mat)
+void QCvMatchResultFilter::execFilter(const Mat& inMat, Mat& outMat)
 {
-    if(mat.empty() || m_detector == NULL)
+    outMat = inMat.clone();
+    if (inMat.empty() || m_detector == NULL)
     {
-        return mat;
+        return;
     }
     else
     {
-        if(m_detector->findPatternFromScene(mat))
+        Pose pose;
+        if (m_detector->findPatternFromScene(inMat))
         {
-            return mat;
-        }
-        else
-        {
-            return mat;
+            if (m_camera != NULL && m_camera->isIntrinsicValid() &&
+                m_detector->computePose(m_camera->intrinsic()))
+            {
+                //draw 3d
+                m_detector->tracker()->draw3DCube(outMat, m_camera->intrinsic());
+            }
+            else
+            {
+                //draw 2d
+                m_detector->tracker()->draw2DContour(outMat);
+            }
         }
     }
 }

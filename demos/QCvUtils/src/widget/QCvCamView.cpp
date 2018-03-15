@@ -4,9 +4,6 @@
 #include <QPainter>
 #include <QDebug>
 
-#include "util/QCvDataUtils.h"
-#include "filter/QCvMatFilterChain.h"
-
 QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
 {
     m_cap = new cv::VideoCapture();
@@ -15,7 +12,7 @@ QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
     m_updateTimer->start(1000 / m_fps);
     connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(update()));
 
-    m_filterChain = new QCvMatFilterChain(this);
+    m_camera = new QCvCamera(this);
 }
 
 QCvCamView::~QCvCamView()
@@ -52,12 +49,32 @@ void QCvCamView::onStreamSwitch(bool open)
 
 void QCvCamView::appendFilter(QCvMatFilter* filter)
 {
-    m_filterChain->append(filter);
+    filter->setParent(this);
+    filter->setCamera(m_camera);
+    m_filters.append(filter);
 }
 
 void QCvCamView::setFilterEnabled(QString name, bool enabled)
 {
-    m_filterChain->setEnabled(name, enabled);
+    foreach (QCvMatFilter* filter, m_filters)
+    {
+        if(filter->name() == name)
+        {
+            filter->setEnabled(enabled);
+        }
+    }
+}
+
+bool QCvCamView::updateCalibrarion(QString fileName)
+{
+    if(!fileName.isEmpty())
+    {
+        return m_camera->loadCalibrationData(fileName);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 cv::Mat QCvCamView::currentFrame()
@@ -85,7 +102,7 @@ void QCvCamView::paintEvent(QPaintEvent *event)
     {
         QPainter painter(this);
         m_cap->read(m_frame);
-        m_frame = m_filterChain->execFilter(m_frame);
+        execFilters(m_frame, m_frame);
         if(!m_frame.empty())
         {
             painter.setRenderHints(QPainter::Antialiasing, true);//抗锯齿
@@ -96,5 +113,13 @@ void QCvCamView::paintEvent(QPaintEvent *event)
         {
             emit emptyFrameError();
         }
+    }
+}
+
+void QCvCamView::execFilters(cv::Mat& inMat, cv::Mat& outMat)
+{
+    foreach (QCvMatFilter* filter, m_filters)
+    {
+        filter->filter(inMat, outMat);
     }
 }

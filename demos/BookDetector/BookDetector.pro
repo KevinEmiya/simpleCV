@@ -22,13 +22,15 @@ SOURCES += \
         src/main.cpp \
         src/gui/MainDlg.cpp \
     src/component/PatternDetector.cpp \
-    src/filter/QCvMatchResultFilter.cpp
+    src/filter/QCvMatchResultFilter.cpp \
+    src/component/PatternTracker.cpp
 
 HEADERS += \
         src/gui/MainDlg.h \
         src/component/Pattern.h \
     src/component/PatternDetector.h \
-    src/filter/QCvMatchResultFilter.h
+    src/filter/QCvMatchResultFilter.h \
+    src/component/PatternTracker.h
 
 FORMS += \
         src/gui/MainDlg.ui

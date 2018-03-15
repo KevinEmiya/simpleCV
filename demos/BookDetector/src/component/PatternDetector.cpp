@@ -1,25 +1,21 @@
 #include "PatternDetector.h"
 
 #include <opencv2/calib3d.hpp>
-#include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
+#include "util/QCvDataUtils.h"
 #include <QDebug>
 
 PatternDetector::PatternDetector(QObject* parent) : QObject(parent)
 {
     m_detector = Ptr<FeatureDetector>(xfeatures2d::SURF::create());
     m_matcher = Ptr<DescriptorMatcher>(new FlannBasedMatcher());
-    m_pattern = NULL;
+    m_patternTracker = new PatternTracker(this);
 }
 
 PatternDetector::~PatternDetector()
 {
-    if (m_pattern != NULL)
-    {
-        delete m_pattern;
-        m_pattern = NULL;
-    }
 }
 
 void PatternDetector::train(const Mat& img, Mat& featureImg)
@@ -28,11 +24,6 @@ void PatternDetector::train(const Mat& img, Mat& featureImg)
     {
         featureImg = img.clone();
 
-        if (m_pattern != NULL)
-        {
-            delete m_pattern;
-            m_pattern = NULL;
-        }
         m_pattern = generatePattern(img);
 
         // train matcher
@@ -50,6 +41,12 @@ void PatternDetector::train(const Mat& img, Mat& featureImg)
 
 bool PatternDetector::findPatternFromScene(const Mat& sceneImg)
 {
+    if (m_pattern == NULL)
+    {
+        qWarning() << "No valid pattern!";
+        return false;
+    }
+
     std::vector<cv::KeyPoint> keypoints;
     extractFeature(sceneImg, keypoints, m_queryDescriptors);
     if (keypoints.size() >= m_pattern->keypoints().size())
@@ -58,9 +55,13 @@ bool PatternDetector::findPatternFromScene(const Mat& sceneImg)
         getMatches(m_queryDescriptors, matches);
         //homography refinement
         bool homographyFound = refineMatchesWithHomography(keypoints, matches, m_homography);
-        if(homographyFound)
+        if (homographyFound)
         {
-            return refineHomography(sceneImg);
+            refineHomography(sceneImg);
+            vector<Point2f> trackerPt2D;
+            perspectiveTransform(m_pattern->points2d(), trackerPt2D, m_homography);
+            m_patternTracker->setPoints2D(trackerPt2D);
+            return true;
         }
         else
         {
@@ -73,7 +74,34 @@ bool PatternDetector::findPatternFromScene(const Mat& sceneImg)
     }
 }
 
-Pattern* PatternDetector::generatePattern(const Mat& img)
+bool PatternDetector::computePose(const CameraIntrinsic& intrinsic)
+{
+    if (m_pattern == NULL)
+    {
+        qWarning() << "No valid pattern!";
+        return false;
+    }
+    if (m_patternTracker->ponits2d().empty())
+    {
+        qWarning() << "Pattern tracker 2D perspective not valid!";
+        return false;
+    }
+
+    Mat rotation, translation;
+    if (!solvePnP(m_pattern->points3d(), m_patternTracker->ponits2d(),
+                  intrinsic.cameraMat, intrinsic.distortCoeff,
+                  rotation, translation))
+    {
+        qWarning() << "Failed solving PnP!";
+        return false;
+    }
+    Pose pose(rotation, translation);
+    m_patternTracker->setPose(pose);
+
+    return true;
+}
+
+Ptr<Pattern> PatternDetector::generatePattern(const Mat& img)
 {
     Mat grayImg;
     if (img.type() == CV_8UC1)
@@ -102,15 +130,15 @@ Pattern* PatternDetector::generatePattern(const Mat& img)
     points2d[2] = Point2f(w, h);
     points2d[3] = Point2f(0, h);
 
-    points3d[0] = Point3f(-unitW, -unitH, 0);
-    points3d[1] = Point3f(unitW, -unitH, 0);
-    points3d[2] = Point3f(unitW, unitH, 0);
-    points3d[3] = Point3f(-unitW, unitH, 0);
+    points3d[0] = Point3f(-unitW, unitH, 0);
+    points3d[1] = Point3f(unitW, unitH, 0);
+    points3d[2] = Point3f(unitW, -unitH, 0);
+    points3d[3] = Point3f(-unitW, -unitH, 0);
     cv::Size imgSize = Size(img.cols, img.rows);
     cv::Mat origImg = img.clone();
-    return new Pattern(imgSize, origImg,
-                       keypoints, descriptors,
-                       points2d, points3d);
+    return Ptr<Pattern>(new Pattern(imgSize, origImg,
+                                    keypoints, descriptors,
+                                    points2d, points3d));
 }
 
 void PatternDetector::extractFeature(const Mat& img, vector<KeyPoint>& keypoints, Mat& descriptors)
@@ -160,19 +188,19 @@ bool PatternDetector::refineMatchesWithHomography(const vector<KeyPoint>& queryK
     vector<DMatch> inliers;
     for (size_t i = 0; i < inliersMask.size(); i++)
     {
-        if(inliersMask[i])
+        if (inliersMask[i])
             inliers.push_back(matches[i]);
     }
     matches.swap(inliers);
     return matches.size() >= minMatchesAllowed;
 }
 
-bool PatternDetector::refineHomography(const Mat& sceneImg)
+void PatternDetector::refineHomography(const Mat& sceneImg)
 {
     Mat wrappedImg;
     warpPerspective(sceneImg, wrappedImg,
                     m_homography, m_pattern->size(),
-                    WARP_INVERSE_MAP|INTER_CUBIC);
+                    WARP_INVERSE_MAP | INTER_CUBIC);
     vector<KeyPoint> warpedKeypoints;
     vector<DMatch> refinedMatches;
     extractFeature(wrappedImg, warpedKeypoints, m_queryDescriptors);
@@ -181,34 +209,17 @@ bool PatternDetector::refineHomography(const Mat& sceneImg)
     bool homographyFound = refineMatchesWithHomography(warpedKeypoints,
                                                        refinedMatches,
                                                        refinedHomography);
-    if(homographyFound)
+    if (homographyFound)
     {
-        qDebug() << "before refinement";
-        showHomography();
         m_homography = m_homography * refinedHomography;
-        qDebug() << "after refinement";
-        showHomography();
-        Mat matchImg;
-        drawMatches(m_pattern->data(), m_pattern->keypoints(), wrappedImg, warpedKeypoints, refinedMatches, matchImg);
-        imshow("match image", matchImg);
-        return true;
-    }
-    else
-    {
-        return false;
+        //        Mat matchImg;
+        //        drawMatches(m_pattern->data(), m_pattern->keypoints(), wrappedImg, warpedKeypoints, refinedMatches, matchImg);
+        //        imshow("match image", matchImg);
     }
 }
 
 void PatternDetector::showHomography()
 {
     qDebug() << "Homography:";
-    for(int i = 0; i < m_homography.cols; i++)
-    {
-        QString homoStr;
-        for(int j = 0; j < m_homography.rows; j++)
-        {
-            homoStr.append(QString("%1 ").arg(m_homography.at<double>(i, j)));
-        }
-        qDebug() << homoStr;
-    }
+    QCvDataUtils::showCvMat2D(m_homography);
 }

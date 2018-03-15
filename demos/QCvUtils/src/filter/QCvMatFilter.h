@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QString>
 
+#include "component/QCvCamera.h"
+
 class QCvMatFilter : public QObject
 {
     Q_OBJECT
@@ -20,18 +22,31 @@ class QCvMatFilter : public QObject
     QString name() { return m_name; }
     void setEnabled(bool enabled) { m_enabled = enabled; }
 
-    cv::Mat filter(const cv::Mat& mat)
+    void filter(const cv::Mat& inMat, cv::Mat& outMat)
     {
+        if (m_enabled)
+        {
+            execFilter(inMat, outMat);
+        }
+        else
+        {
+            outMat = inMat.clone();
+        }
+    }
 
-        return m_enabled ? execFilter(mat) : mat;
+    void setCamera(const QCvCamera* camera)
+    {
+        m_camera = camera;
     }
 
   protected:
-    virtual cv::Mat execFilter(const cv::Mat& mat) = 0;
+    virtual void execFilter(const cv::Mat& mat, cv::Mat& outMat) = 0;
 
   protected:
     QString m_name;
     bool m_enabled;
+    // intrinsic parameters of the camera
+    const QCvCamera* m_camera;
 };
 
 #endif // QCVMATFILTER_H

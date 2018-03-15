@@ -3,12 +3,12 @@
 
 #include <QDialog>
 
-class QString;
-class QCvMatFilterChain;
-class QFileDialog;
+#include <QResizeEvent>
+#include <QString>
+#include <QFileDialog>
 
 #include "opencv2/opencv.hpp"
-#include <QResizeEvent>
+#include "filter/QCvEdgeDetectFilter.h"
 
 namespace Ui
 {
@@ -40,7 +40,7 @@ class ImageDlg : public QDialog
     QFileDialog* m_imgSelectDlg;
 
     cv::Mat m_edgeMat;
-    QCvMatFilterChain* m_filters;
+    QCvEdgeDetectFilter* m_filter;
     bool m_extractingEdge;
 };
 

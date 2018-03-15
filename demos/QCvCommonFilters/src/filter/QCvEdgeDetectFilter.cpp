@@ -9,10 +9,8 @@ void QCvEdgeDetectFilter::setThresholds(int lower, int higher)
     m_higherThres = higher;
 }
 
-cv::Mat QCvEdgeDetectFilter::execFilter(const cv::Mat& mat)
+void QCvEdgeDetectFilter::execFilter(const cv::Mat& inMat, cv::Mat &outMat)
 {
-    cv::Mat ret;
     // Canny Detector
-    cv::Canny(mat, ret, m_lowerThres, m_higherThres);
-    return ret;
+    cv::Canny(inMat, outMat, m_lowerThres, m_higherThres);
 }

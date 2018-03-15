@@ -9,7 +9,7 @@ class QCvHisEqFilter : public QCvMatFilter
     QCvHisEqFilter(QString name) : QCvMatFilter(name) {}
 
   protected:
-    cv::Mat execFilter(const cv::Mat &mat);
+    void execFilter(const cv::Mat& inMat, cv::Mat& outMat);
 };
 
 #endif // QCVHISEQFILTER_H

@@ -42,3 +42,17 @@ QImage QCvDataUtils::cvMatToQImage(const cv::Mat& mat)
         }
     }
 }
+
+void QCvDataUtils::showCvMat2D(const cv::Mat_<float>& mat)
+{
+    qDebug() << "========================";
+    for(int i = 0; i < mat.cols; i++)
+    {
+        QString out;
+        for(int j = 0; j < mat.rows; j++)
+        {
+            out.append(QString("%1 ").arg(mat.at<float>(i, j)));
+        }
+        qDebug() << out;
+    }
+}

@@ -27,7 +27,7 @@ class QCvEdgePtFilter : public QCvMatFilter
     void onCapture();
 
   protected:
-    virtual cv::Mat execFilter(const cv::Mat& mat);
+    virtual void execFilter(const cv::Mat& inMat, cv::Mat& outMat);
 
   private:
     int m_colCnt;

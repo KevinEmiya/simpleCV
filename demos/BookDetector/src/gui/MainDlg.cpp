@@ -3,11 +3,14 @@
 
 #include <QFileDialog>
 
+#include <opencv2/core/persistence.hpp>
 #include <opencv2/highgui.hpp>
 
 #include "component/PatternDetector.h"
-#include "util/QCvDataUtils.h"
 #include "filter/QCvMatchResultFilter.h"
+#include "util/QCvDataUtils.h"
+
+#include <QDebug>
 
 MainDlg::MainDlg(QWidget* parent) : QDialog(parent),
                                     ui(new Ui::MainDlg)
@@ -16,7 +19,6 @@ MainDlg::MainDlg(QWidget* parent) : QDialog(parent),
     m_featDetected = false;
 
     //init widgets
-
 
     m_labelImg = new QLabel(this);
     m_labelImg->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -38,6 +40,7 @@ MainDlg::MainDlg(QWidget* parent) : QDialog(parent),
 
     //btn load image
     connect(ui->btnLoad, &QPushButton::clicked, this, &MainDlg::onBtnLoad);
+    connect(ui->btnLoadCamInt, &QPushButton::clicked, this, &MainDlg::onBtnLoadCamInt);
 
     //btn generate model
     connect(ui->btnGen, &QPushButton::clicked, this, [this, detector]() {
@@ -98,6 +101,32 @@ void MainDlg::onBtnLoad()
     }
 }
 
+void MainDlg::onBtnLoadCamInt()
+{
+    m_camView->onStreamSwitch(false);
+    bool sampleLoaded = ui->btnGen->isEnabled();
+    ui->btnGen->setDisabled(true);
+    ui->btnMatch->setDisabled(true);
+
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    "Please Select a Calibration File",
+                                                    ".", "Config Files (*.xml *.yml *.json)");
+    if(!fileName.isEmpty())
+    {
+        m_camView->updateCalibrarion(fileName);
+        m_camView->onStreamSwitch(true);
+    }
+
+    if(sampleLoaded)
+    {
+        ui->btnGen->setEnabled(true);
+    }
+    if (m_featDetected)
+    {
+        ui->btnMatch->setEnabled(true);
+    }
+}
+
 void MainDlg::resizeEvent(QResizeEvent* event)
 {
     if (m_labelImg->pixmap() != NULL && m_labelImg->isVisible())
@@ -112,7 +141,7 @@ void MainDlg::resizeEvent(QResizeEvent* event)
 void MainDlg::loadImage(Mat& img)
 {
     QString imgFileName = QFileDialog::getOpenFileName(this,
-                                                       "Please Select a Cascade Classifier",
+                                                       "Please Select a Muster Image",
                                                        ".", "Image Files (*.png *.jpg)");
     if (!imgFileName.isEmpty())
     {

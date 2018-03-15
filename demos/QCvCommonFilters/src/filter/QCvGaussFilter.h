@@ -5,20 +5,20 @@
 
 class QCvGaussFilter : public QCvMatFilter
 {
-public:
+  public:
     QCvGaussFilter(QString name) : QCvMatFilter(name)
     {
         m_kernelSize = cv::Size(5, 5);
         m_sigma = 5;
     }
 
-public:
+  public:
     void setKernelSize(unsigned int size);
 
-protected:
-    cv::Mat execFilter(const cv::Mat &mat);
+  protected:
+    void execFilter(const cv::Mat& inMat, cv::Mat& outMat);
 
-private:
+  private:
     cv::Size m_kernelSize;
     unsigned int m_sigma;
 };

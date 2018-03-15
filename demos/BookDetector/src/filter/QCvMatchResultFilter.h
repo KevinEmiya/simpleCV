@@ -11,7 +11,7 @@ class QCvMatchResultFilter : public QCvMatFilter
         : QCvMatFilter(name, parent) { m_detector = detector; }
 
   protected:
-    virtual Mat execFilter(const Mat& mat);
+    virtual void execFilter(const Mat& inMat, Mat& outMat);
 
   private:
     PatternDetector* m_detector;

@@ -2,13 +2,8 @@
 #include "ui_ImageDlg.h"
 
 #include <QDebug>
-#include <QFileDialog>
-#include <QString>
 #include <QStringList>
 
-#include "filter/QCvEdgeDetectFilter.h"
-#include "filter/QCvHisEqFilter.h"
-#include "filter/QCvMatFilterChain.h"
 #include "util/QCvDataUtils.h"
 
 ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
@@ -39,24 +34,22 @@ ImageDlg::~ImageDlg()
 
 void ImageDlg::initFilters()
 {
-    m_filters = new QCvMatFilterChain(this);
-    QCvEdgeDetectFilter* cannyFilter = new QCvEdgeDetectFilter("canny");
-    m_filters->append(cannyFilter);
+    m_filter = new QCvEdgeDetectFilter("canny");
     connect(ui->btnEdge, &QPushButton::clicked, this, &ImageDlg::onExtractEdge);
 
-    connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter]() {
-        cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
+    connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this]() {
+        m_filter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
         if (m_extractingEdge)
         {
-            m_edgeMat = m_filters->execFilter(m_imgMat);
+            m_filter->execFilter(m_imgMat, m_edgeMat);
             showImage(m_edgeMat);
         }
     });
-    connect(ui->highThresSlider, &QSlider::sliderMoved, this, [this, cannyFilter]() {
-        cannyFilter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
+    connect(ui->highThresSlider, &QSlider::sliderMoved, this, [this]() {
+        m_filter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
         if (m_extractingEdge)
         {
-            m_edgeMat = m_filters->execFilter(m_imgMat);
+            m_filter->execFilter(m_imgMat, m_edgeMat);
             showImage(m_edgeMat);
         }
     });
@@ -91,7 +84,8 @@ void ImageDlg::resizeEvent(QResizeEvent* event)
 void ImageDlg::onExtractEdge(bool clicked)
 {
     m_extractingEdge = clicked;
-    showImage(clicked ? m_filters->execFilter(m_imgMat) : m_imgMat);
+    m_filter->execFilter(m_imgMat, m_edgeMat);
+    showImage(clicked ? m_edgeMat  : m_imgMat);
 }
 
 void ImageDlg::showImage(const cv::Mat& mat, bool showOrigSize)

@@ -30,6 +30,7 @@ class MainDlg : public QDialog
 
   private slots:
     void onBtnLoad();
+    void onBtnLoadCamInt();
 
   private:
     Ui::MainDlg* ui;

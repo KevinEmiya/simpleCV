@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 include(../QCvUtils/BuildSchema.pri)
-include(../QCvUtils/QCvUtils.pri)
 include(../QCvCommonFilters/QCvCommonFilters.pri)
 
 QT       += core gui

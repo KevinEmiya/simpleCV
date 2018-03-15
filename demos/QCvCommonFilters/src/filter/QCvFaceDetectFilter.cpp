@@ -12,17 +12,17 @@ bool QCvFaceDetectFilter::isClassifierValid()
     return !m_classifier.empty();
 }
 
-cv::Mat QCvFaceDetectFilter::execFilter(const cv::Mat& mat)
+void QCvFaceDetectFilter::execFilter(const cv::Mat& inMat, cv::Mat &outMat)
 {
+    outMat = inMat.clone();
     if (m_classifier.empty())
     {
-        return mat;
+        return;
     }
 
-    cv::Mat retMat = mat.clone();
     std::vector<cv::Rect> faces;
     cv::Mat frameGray;
-    cv::cvtColor(retMat, frameGray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(outMat, frameGray, cv::COLOR_BGR2GRAY);
     cv::equalizeHist(frameGray, frameGray);
     //-- Detect faces
     m_classifier.detectMultiScale(frameGray, faces, 1.1, 2, 0 | cv::CASCADE_SCALE_IMAGE,
@@ -30,7 +30,7 @@ cv::Mat QCvFaceDetectFilter::execFilter(const cv::Mat& mat)
     for (size_t i = 0; i < faces.size(); i++)
     {
         cv::Point center(faces[i].x + faces[i].width / 2, faces[i].y + faces[i].height / 2);
-        cv::ellipse(retMat, center,
+        cv::ellipse(outMat, center,
                     cv::Size(faces[i].width / 2, faces[i].height / 2), 0, 0, 360,
                     cv::Scalar(255, 0, 255), 4, 8, 0);
 //        cv::Mat faceROI = frameGray(faces[i]);
@@ -44,5 +44,4 @@ cv::Mat QCvFaceDetectFilter::execFilter(const cv::Mat& mat)
 //            circle(frame, eye_center, radius, Scalar(255, 0, 0), 4, 8, 0);
 //        }
     }
-    return retMat;
 }

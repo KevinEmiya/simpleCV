@@ -8,9 +8,7 @@ void QCvGaussFilter::setKernelSize(unsigned int size)
     m_sigma = size;
 }
 
-cv::Mat QCvGaussFilter::execFilter(const cv::Mat &mat)
+void QCvGaussFilter::execFilter(const cv::Mat& inMat, cv::Mat& outMat)
 {
-    cv::Mat ret;
-    cv::GaussianBlur(mat, ret, m_kernelSize, m_sigma);
-    return ret;
+    cv::GaussianBlur(inMat, outMat, m_kernelSize, m_sigma);
 }
