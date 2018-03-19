@@ -5,6 +5,7 @@
 #include <QStringList>
 
 #include "util/QCvDataUtils.h"
+#include "filter/QCvEdgeDetectFilter.h"
 
 ImageDlg::ImageDlg(QWidget* parent) : QDialog(parent),
                                       ui(new Ui::ImageDlg)
@@ -34,22 +35,18 @@ ImageDlg::~ImageDlg()
 
 void ImageDlg::initFilters()
 {
-    m_filter = new QCvEdgeDetectFilter("canny");
-    connect(ui->btnEdge, &QPushButton::clicked, this, &ImageDlg::onExtractEdge);
-
-    connect(ui->lowThresSlider, &QSlider::sliderMoved, this, [this]() {
-        m_filter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
-        if (m_extractingEdge)
-        {
-            m_filter->execFilter(m_imgMat, m_edgeMat);
-            showImage(m_edgeMat);
-        }
+    QCvEdgeDetectFilter* filter = new QCvEdgeDetectFilter("canny", this);
+    connect(ui->btnEdge, &QPushButton::clicked, this, [this, filter](bool clicked) {
+        m_extractingEdge = clicked;
+        filter->filter(m_imgMat, m_edgeMat);
+        showImage(clicked ? m_edgeMat : m_imgMat);
     });
-    connect(ui->highThresSlider, &QSlider::sliderMoved, this, [this]() {
-        m_filter->setThresholds(ui->lowThresSlider->value(), ui->highThresSlider->value());
+
+    connect(ui->thresSlider, &QSlider::sliderMoved, this, [this, filter](int thres) {
+        filter->setThresholds(thres);
         if (m_extractingEdge)
         {
-            m_filter->execFilter(m_imgMat, m_edgeMat);
+            filter->filter(m_imgMat, m_edgeMat);
             showImage(m_edgeMat);
         }
     });
@@ -79,13 +76,6 @@ void ImageDlg::resizeEvent(QResizeEvent* event)
                                                                ui->imgLabel->height()));
     }
     QDialog::resizeEvent(event);
-}
-
-void ImageDlg::onExtractEdge(bool clicked)
-{
-    m_extractingEdge = clicked;
-    m_filter->execFilter(m_imgMat, m_edgeMat);
-    showImage(clicked ? m_edgeMat  : m_imgMat);
 }
 
 void ImageDlg::showImage(const cv::Mat& mat, bool showOrigSize)

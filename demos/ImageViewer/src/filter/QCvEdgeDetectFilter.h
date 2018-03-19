@@ -8,19 +8,16 @@
 class QCvEdgeDetectFilter : public QCvMatFilter
 {
   public:
-    QCvEdgeDetectFilter(QString name) : QCvMatFilter(name)
-    {
-        m_lowerThres = 160;
-        m_higherThres = 240;
-    }
+    QCvEdgeDetectFilter(QString name, QObject* parent = nullptr);
 
   public:
-    void setThresholds(int lower, int higher);
+    void setThresholds(int thres);
+
+  protected:
     void execFilter(const cv::Mat& mat, cv::Mat& outMat);
 
   private:
-    int m_lowerThres;
-    int m_higherThres;
+    int m_thres;
 };
 
 #endif // QCVEDGEDETECTFILTER_H

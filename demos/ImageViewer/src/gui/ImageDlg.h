@@ -8,7 +8,6 @@
 #include <QFileDialog>
 
 #include "opencv2/opencv.hpp"
-#include "filter/QCvEdgeDetectFilter.h"
 
 namespace Ui
 {
@@ -32,7 +31,6 @@ class ImageDlg : public QDialog
 
   private slots:
     void onReadImage();
-    void onExtractEdge(bool clicked);
 
   private:
     Ui::ImageDlg* ui;
@@ -40,7 +38,6 @@ class ImageDlg : public QDialog
     QFileDialog* m_imgSelectDlg;
 
     cv::Mat m_edgeMat;
-    QCvEdgeDetectFilter* m_filter;
     bool m_extractingEdge;
 };
 

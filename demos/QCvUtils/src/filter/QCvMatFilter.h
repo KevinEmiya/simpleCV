@@ -42,7 +42,7 @@ class QCvMatFilter : public QObject
   protected:
     virtual void execFilter(const cv::Mat& mat, cv::Mat& outMat) = 0;
 
-  protected:
+  private:
     QString m_name;
     bool m_enabled;
     // intrinsic parameters of the camera

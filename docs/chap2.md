@@ -115,7 +115,9 @@ void ImageDlg::showImage(QString imgPath)
 
 本节有关Qt集成OpenCV的内容就先介绍到这里。（[>>点击这里查看完整代码实现](https://github.com/KevinEmiya/simpleCV/tree/master/demos/ImageViewer)）
 
-下一节会尝试借助OpenCV的视频捕获功能，实现一个Qt的视频显示控件。
+下一节会尝设计一个便于后续开发处理的MatFilter接口，并使用这个接口将图像的边缘提取功能添加到本节实现的图片浏览器中。
+
+[>>返回系列索引](http://www.jianshu.com/p/80762f0e9d00)
 
 ## 参考链接
 1. [Converting Between cv::Mat and QImage or QPixmap](https://asmaloney.com/2013/11/code/converting-between-cvmat-and-qimage-or-qpixmap/): OpenCV和Qt图像数据相互转化的详细教程

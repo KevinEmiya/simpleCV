@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 include(../QCvUtils/BuildSchema.pri)
-include(../QCvCommonFilters/QCvCommonFilters.pri)
+include(../QCvUtils/QCvUtils.pri)
 
 QT       += core gui
 
@@ -18,10 +18,12 @@ TEMPLATE = app
 
 SOURCES += \
         src/main.cpp \
-        src/gui/ImageDlg.cpp
+        src/gui/ImageDlg.cpp \
+        src/filter/QCvEdgeDetectFilter.cpp
 
 HEADERS += \
-        src/gui/ImageDlg.h
+        src/gui/ImageDlg.h \
+        src/filter/QCvEdgeDetectFilter.h
 
 FORMS += \
         src/gui/ImageDlg.ui
