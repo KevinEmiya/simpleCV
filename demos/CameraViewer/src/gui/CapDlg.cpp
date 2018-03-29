@@ -19,7 +19,7 @@ CapDlg::~CapDlg()
     delete ui;
 }
 
-void CapDlg::setFrame(cv::Mat frame)
+void CapDlg::setFrame(const cv::Mat& frame)
 {
     QImage img = QCvDataUtils::cvMatToQImage(frame);
     ui->labelImg->setPixmap(QPixmap::fromImage(img).scaled(ui->labelImg->width(),

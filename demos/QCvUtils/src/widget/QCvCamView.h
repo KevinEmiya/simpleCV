@@ -30,6 +30,7 @@ signals:
 
 public slots:
     void onStreamSwitch(bool open);
+    void onRenderSwitch(bool open);
     void onFpsChanged(int fps);
 
 protected:
@@ -37,9 +38,9 @@ protected:
     virtual void execFilters(cv::Mat& inMat, cv::Mat& outMat);
 
 private:
-    bool m_streamOpen;
     cv::VideoCapture* m_cap;
     QCvCamera* m_camera;
+    bool m_isRendering;
 
     cv::Mat m_frame;
     int m_fps;

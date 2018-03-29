@@ -1,10 +1,10 @@
 ﻿#include "QCvCamView.h"
 
+#include <QDebug>
 #include <QImage>
 #include <QPainter>
-#include <QDebug>
 
-QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
+QCvCamView::QCvCamView(QWidget* parent) : QWidget(parent)
 {
     m_cap = new cv::VideoCapture();
     m_fps = 60;
@@ -17,7 +17,7 @@ QCvCamView::QCvCamView(QWidget *parent) : QWidget(parent)
 
 QCvCamView::~QCvCamView()
 {
-    if(m_cap != NULL)
+    if (m_cap != NULL)
     {
         delete m_cap;
         m_cap = NULL;
@@ -26,25 +26,26 @@ QCvCamView::~QCvCamView()
 
 void QCvCamView::onStreamSwitch(bool open)
 {
-    if(open && !m_streamOpen) //打开摄像头
+    if (open && !m_cap->isOpened()) //open the camera
     {
-        m_streamOpen = true;
-        if(!m_cap->isOpened())
+        bool ret = m_cap->open(0);
+        if (!ret || !m_cap->isOpened())
         {
-            bool ret = m_cap->open(0);
-            if(!ret || !m_cap->isOpened())
-            {
-                emit camOpenError();
-                return;
-            }
+            emit camOpenError();
+            return;
         }
         update();
     }
-    else if (!open && m_streamOpen) //关闭摄像头
+    else if (!open && m_cap->isOpened()) //close the camera
     {
-        m_streamOpen = false;
+        m_cap->release();
         update();
     }
+}
+
+void QCvCamView::onRenderSwitch(bool open)
+{
+    m_isRendering = open;
 }
 
 void QCvCamView::appendFilter(QCvMatFilter* filter)
@@ -58,7 +59,7 @@ void QCvCamView::setFilterEnabled(QString name, bool enabled)
 {
     foreach (QCvMatFilter* filter, m_filters)
     {
-        if(filter->name() == name)
+        if (filter->name() == name)
         {
             filter->setEnabled(enabled);
         }
@@ -67,7 +68,7 @@ void QCvCamView::setFilterEnabled(QString name, bool enabled)
 
 bool QCvCamView::updateCalibrarion(QString fileName)
 {
-    if(!fileName.isEmpty())
+    if (!fileName.isEmpty())
     {
         return m_camera->loadCalibrationData(fileName);
     }
@@ -84,7 +85,7 @@ cv::Mat QCvCamView::currentFrame()
 
 void QCvCamView::onFpsChanged(int fps)
 {
-    if(fps <= 0)
+    if (fps <= 0)
     {
         emit invalidFpsError();
         return;
@@ -96,16 +97,16 @@ void QCvCamView::onFpsChanged(int fps)
     m_updateTimer->start(1000 / fps);
 }
 
-void QCvCamView::paintEvent(QPaintEvent *event)
+void QCvCamView::paintEvent(QPaintEvent* event)
 {
-    if(m_streamOpen && m_cap->isOpened())
+    if (m_isRendering && m_cap->isOpened())
     {
         QPainter painter(this);
         m_cap->read(m_frame);
         execFilters(m_frame, m_frame);
-        if(!m_frame.empty())
+        if (!m_frame.empty())
         {
-            painter.setRenderHints(QPainter::Antialiasing, true);//抗锯齿
+            painter.setRenderHints(QPainter::Antialiasing, true); //抗锯齿
             painter.scale(rect().width() * 1.0 / m_frame.cols, rect().height() * 1.0 / m_frame.rows);
             painter.drawImage(0, 0, QCvDataUtils::cvMatToQImage(m_frame));
         }

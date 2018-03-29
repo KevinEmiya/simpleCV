@@ -20,7 +20,7 @@ signals:
     void closed();
 
 public:
-    void setFrame(cv::Mat frame);
+    void setFrame(const cv::Mat& frame);
 
 private slots:
     void onBtnSave();

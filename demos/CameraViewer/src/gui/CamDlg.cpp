@@ -94,7 +94,7 @@ void CamDlg::onCapFrame()
     cv::Mat currentFrame = m_camView->currentFrame();
     if(!currentFrame.empty())
     {
-        m_camView->onStreamSwitch(false);
+        m_camView->onRenderSwitch(false);
         m_capDlg->show();
         m_capDlg->setFrame(currentFrame);
     }
@@ -107,5 +107,6 @@ void CamDlg::onCapFrame()
 
 void CamDlg::onCapDlgClosed()
 {
-    m_camView->onStreamSwitch(true);
+    m_camView->onRenderSwitch(true);
+    ui->btnCap->setChecked(false);
 }
