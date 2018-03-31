@@ -5,7 +5,9 @@
 #-------------------------------------------------
 
 include(../QCvUtils/BuildSchema.pri)
-include(../QCvCommonFilters/QCvCommonFilters.pri)
+include(../QCvUtils/QCvUtils.pri)
+
+INCLUDEPATH += $$PWD/src
 
 QT       += core gui
 
@@ -15,11 +17,13 @@ TARGET = FaceDetectionDemo
 TEMPLATE = app
 
 SOURCES += \
-        main.cpp \
-        FaceVideoDlg.cpp
+        src/main.cpp \
+        src/gui/FaceVideoDlg.cpp \
+        src/filter/QCvFaceDetectFilter.cpp
 
 HEADERS += \
-        FaceVideoDlg.h
+        src/gui/FaceVideoDlg.h \
+        src/filter/QCvFaceDetectFilter.h
 
 FORMS += \
-        FaceVideoDlg.ui
+        src/gui/FaceVideoDlg.ui

@@ -10,10 +10,8 @@ PKGCONFIG += opencv
 
 SOURCES += \
     $$PWD/src/filter/QCvGaussFilter.cpp \
-    $$PWD/src/filter/QCvHisEqFilter.cpp \
-    $$PWD/src/filter/QCvFaceDetectFilter.cpp
+    $$PWD/src/filter/QCvHisEqFilter.cpp
 
 HEADERS  += \
     $$PWD/src/filter/QCvGaussFilter.h \
-    $$PWD/src/filter/QCvHisEqFilter.h \
-    $$PWD/src/filter/QCvFaceDetectFilter.h
+    $$PWD/src/filter/QCvHisEqFilter.h

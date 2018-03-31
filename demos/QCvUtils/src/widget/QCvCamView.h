@@ -35,7 +35,7 @@ public slots:
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
-    virtual void execFilters(cv::Mat& inMat, cv::Mat& outMat);
+    virtual void execFilters(const cv::Mat& inMat, cv::Mat& outMat);
 
 private:
     cv::VideoCapture* m_cap;

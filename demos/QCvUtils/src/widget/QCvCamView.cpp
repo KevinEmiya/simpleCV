@@ -117,10 +117,11 @@ void QCvCamView::paintEvent(QPaintEvent* event)
     }
 }
 
-void QCvCamView::execFilters(cv::Mat& inMat, cv::Mat& outMat)
+void QCvCamView::execFilters(const cv::Mat& inMat, cv::Mat& outMat)
 {
+    outMat = inMat.clone();
     foreach (QCvMatFilter* filter, m_filters)
     {
-        filter->filter(inMat, outMat);
+        filter->filter(outMat, outMat);
     }
 }

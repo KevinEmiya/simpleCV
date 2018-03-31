@@ -247,7 +247,7 @@ void CapDlg::onBtnSave()
 
 本节有关视频采集控件基础功能的实现就先介绍到这里。（[>>点击这里查看完整代码实现](https://github.Com/KevinEmiya/simpleCV/tree/master/demos/CameraViewer))
 
-下一节将在此基础上为控件添加视频帧过滤和相机标定信息的管理功能。
+下一节将在此基础上为控件添加视频帧滤波和相机标定信息的管理。
 
 [>>返回系列索引](http://www.jianshu.com/p/80762f0e9d00)
 

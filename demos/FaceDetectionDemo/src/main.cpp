@@ -1,4 +1,4 @@
-#include "FaceVideoDlg.h"
+#include "gui/FaceVideoDlg.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
