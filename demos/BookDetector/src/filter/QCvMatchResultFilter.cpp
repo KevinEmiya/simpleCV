@@ -12,11 +12,12 @@ void QCvMatchResultFilter::execFilter(const Mat& inMat, Mat& outMat)
         Pose pose;
         if (m_detector->findPatternFromScene(inMat))
         {
-            if (m_camera != NULL && m_camera->isIntrinsicValid() &&
-                m_detector->computePose(m_camera->intrinsic()))
+            const QCvCamera* camera = QCvMatFilter::camera();
+            if (camera != NULL && camera->isIntrinsicValid() &&
+                m_detector->computePose(camera->intrinsic()))
             {
                 //draw 3d
-                m_detector->tracker()->draw3DCube(outMat, m_camera->intrinsic());
+                m_detector->tracker()->draw3DCube(outMat, camera->intrinsic());
             }
             else
             {

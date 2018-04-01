@@ -41,6 +41,7 @@ class QCvMatFilter : public QObject
 
   protected:
     virtual void execFilter(const cv::Mat& mat, cv::Mat& outMat) = 0;
+    const QCvCamera* camera() const { return m_camera; }
 
   private:
     QString m_name;

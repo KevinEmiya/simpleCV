@@ -9,7 +9,7 @@
 ## 添加视频滤波管理
 
 在实际应用中比较常见的一种应用场景是：对采集到的图像帧进行处理，并将处理的结果实时展示在所采集的帧上。这时，我们在[第三节](https://www.jianshu.com/p/10886232f5e8)中设计的MatFilter接口就可以发挥作用了——在基础视频控件中添加视频滤波管理相关的功能，即可很方便地实现对所采集图像帧的实时处理和展示。秉承第三节的设计思路，视滤波的管理大致包含下面的功能：
-- 提供滤波器的容器，即第三节中提到过的*滤波链**，采集到的视频帧将按照视频链的顺序以此进滤波，并将最终结果显示在控件上；
+- 提供滤波器的容器，即第三节中提到过的*滤波链*，采集到的视频帧将按照视频链的顺序以此进滤波，并将最终结果显示在控件上；
 - 添加、启用、禁用特滤波器的接口。
 
 依照上面的思路，在视频控件类QCvCamView中添加如下声明：
@@ -106,18 +106,20 @@ class QCvCamera : public QObject
   public:
     void setIntrinsic(const CameraIntrinsic& intrinsic);
     const CameraIntrinsic& intrinsic() const;
-    const Pose& extrinsic() const;
+    const QList<Pose>& poses() const;
     bool isIntrinsicValid() const;
     bool loadCalibrationData(const QString& fileName);
 
   public slots:
-    void onExtrinsicChanged(const cv::Mat& rotation, const cv::Mat& translation);
+    void addPose(const cv::Mat& rotation, const cv::Mat& translation);
 
   private:
     CameraIntrinsic m_intrinsic;
-    Pose m_extrinsic;
+    QList<Pose> m_poses;
 ```
-这里除了基础的getter和setter之外，还有一个从文件中读取标定信息的方法：
+简单说明一下：
+- 对于同一个相机而言，不考虑老旧损坏等特殊情况的话，内参数据是基本不会发生变化的；而随着相机位置和角度的调整，外参会经常发生变化，因此这里提供了一个存放多组外参的列表作为这个数据类的成员组件；
+- 除了基础的getter和setter之外，还有一个从文件中读取标定信息的方法：
 ```cpp
 bool QCvCamera::loadCalibrationData(const QString& fileName)
 {

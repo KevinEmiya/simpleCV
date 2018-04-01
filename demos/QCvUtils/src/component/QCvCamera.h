@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QList>
 
 #include <opencv2/core.hpp>
 
@@ -36,21 +37,21 @@ class QCvCamera : public QObject
   public:
     void setIntrinsic(const CameraIntrinsic& intrinsic) { m_intrinsic = intrinsic; }
     const CameraIntrinsic& intrinsic() const { return m_intrinsic; }
-    const Pose& extrinsic() const { return m_extrinsic; }
+    const QList<Pose>& poses() const { return m_poses; }
     bool isIntrinsicValid() const;
 
     bool loadCalibrationData(const QString& fileName);
 
   public slots:
-    void onExtrinsicChanged(const cv::Mat& rotation, const cv::Mat& translation)
+    void addPose(const cv::Mat& rotation, const cv::Mat& translation)
     {
-        m_extrinsic.rotation = rotation;
-        m_extrinsic.translation = translation;
+        Pose pose(rotation, translation);
+        m_poses.append(pose);
     }
 
   private:
     CameraIntrinsic m_intrinsic;
-    Pose m_extrinsic;
+    QList<Pose> m_poses;
 };
 
 #endif // QCVCAMERA_H
